@@ -20,13 +20,13 @@ Periodo: Primer Semestre 2026
 | 202202410 | Marcos Daniel Bonifasi de Leon |
 | 202300670 | David Estuardo Barrios Ramírez |
 
-# 1. Introducción
+## 1. Introducción
 
 La presente documentación corresponde al desarrollo de la Práctica 1: “Monte Alto y la conectividad”, cuyo objetivo es el diseño, implementación y validación de una red LAN segmentada y segura, utilizando Cisco Packet Tracer como herramienta de simulación.
 
 El escenario planteado representa la infraestructura de red de un colegio que ha crecido de forma desordenada, provocando problemas de conectividad, pérdida de paquetes y dificultad en la administración de la red. A partir de esta problemática, se propone una solución basada en buenas prácticas de redes, aplicando segmentación lógica, protocolos de redundancia, enrutamiento dinámico y políticas de seguridad.
 
-# 2. Objetivo General
+## 2. Objetivo General
 
 Diseñar e implementar una red LAN funcional que permita la comunicación eficiente y segura entre los distintos departamentos del colegio Monte Alto, mediante:
 
@@ -40,7 +40,7 @@ Diseñar e implementar una red LAN funcional que permita la comunicación eficie
 
 - Aplicación de medidas de seguridad en los puertos de acceso.
 
-# 3. Objetivos Específicos
+## 3. Objetivos Específicos
 
 - Configurar al menos 6 VLANs distribuidas entre dos edificios.
 
@@ -61,7 +61,7 @@ Diseñar e implementar una red LAN funcional que permita la comunicación eficie
 
 - Documentar detalladamente todas las configuraciones realizadas.
 
-# 4. Alcance del Proyecto
+## 4. Alcance del Proyecto
 
 El alcance de la práctica incluye:
 
@@ -85,7 +85,7 @@ El alcance de la práctica incluye:
 
 Quedan fuera del alcance de esta práctica la implementación en equipos reales y la aplicación de mecanismos avanzados de seguridad a nivel de firewall.
 
-# 5. Metodología de Trabajo
+## 5. Metodología de Trabajo
 
 Para el desarrollo del proyecto se siguió la siguiente metodología:
 
@@ -103,7 +103,7 @@ Para el desarrollo del proyecto se siguió la siguiente metodología:
 
 - Control de versiones y seguimiento del proyecto mediante GitHub.
 
-# 6. Herramientas y Recursos Utilizados
+## 6. Herramientas y Recursos Utilizados
 
 - Cisco Packet Tracer
 
@@ -116,9 +116,9 @@ Para el desarrollo del proyecto se siguió la siguiente metodología:
 
   - Repositorio de clases del curso
 
-# 7. Diseño de la Topología de Red
+## 7. Diseño de la Topología de Red
 
-## 7.1 Descripción General
+### 7.1 Descripción General
 
 La topología de red fue diseñada bajo un esquema jerárquico, separando la infraestructura en dos edificios (izquierdo y derecho), cada uno con switches de acceso y un router dedicado, los cuales se interconectan a través de un router central.
 
@@ -132,11 +132,11 @@ Este diseño permite:
 
 - Separación clara entre capa de acceso, distribución y capa de red.
 
-## 7.2 Topología Principal
+### 7.2 Topología Principal
 
-## 7.3 Asignación de puertos
+### 7.3 Asignación de puertos
 
-### 7.3.1 Enlaces entre dispositivos (Nivel 0)
+#### 7.3.1 Enlaces entre dispositivos (Nivel 0)
 
 | Dispositivo Origen | Puerto Origen | Dispositivo Destino | Puerto Destino |
 | ------------------ | ------------- | ------------------- | -------------- |
@@ -144,7 +144,7 @@ Este diseño permite:
 | Router1            | Gig0/1        | Router4             | Gig0/0         |
 | Router4            | Gig0/1        | Router3             | Gig0/0         |
 
-### 7.3.2 Enlaces entre dispositivos - Edificio Izquierdo
+#### 7.3.2 Enlaces entre dispositivos - Edificio Izquierdo
 
 **Nivel 1:**
 
@@ -196,7 +196,7 @@ Este diseño permite:
 | Switch9            | FaE0/22       | PC4                 | FaE0           |
 | Switch10           | FaE0/22       | PC5                 | FaE0           |
 
-### 7.3.3 Enlaces entre dispositivos - Edificio Derecho
+#### 7.3.3 Enlaces entre dispositivos - Edificio Derecho
 
 **Nivel 1:**
 
@@ -254,7 +254,7 @@ Este diseño permite:
 
 Se realizó la configuración base en todos los switches de la topología cumpliendo con los estándares de nomenclatura y seguridad definidos para el **Grupo 28**.
 
-### 1.1 Estandarización de Nombres (Hostnames)
+### 8.1 Estandarización de Nombres (Hostnames)
 
 Se aplicó el formato `SW#A_G#B` donde `#A` representa el identificador secuencial del dispositivo y `#B` el número de grupo (28).
 
@@ -682,11 +682,11 @@ Para verificar la correcta configuración y propagación de VLANs mediante VTP, 
 
 ![Verificación VTP Edificio Derecho](<img/vtp/SW(3)1_vtp.png>)
 
-## 9.3 Creación y Asignación de VLANs
+### 9.3 Creación y Asignación de VLANs
 
 Se procedió a la creación de las VLANs en los switches servidores VTP. Gracias a la configuración previa, estas se replicaron automáticamente a los switches de acceso, donde finalmente se asignaron los puertos correspondientes a los dispositivos finales.
 
-### VLANs Creadas - Edificio Izquierdo
+#### VLANs Creadas - Edificio Izquierdo
 
 **(Configuradas en SW0_G28)**
 
@@ -694,7 +694,7 @@ Se procedió a la creación de las VLANs en los switches servidores VTP. Gracias
 - **VLAN 21:** BASICOS
 - **VLAN 31:** BACHILLERATO
 
-### VLANs Creadas - Edificio Derecho
+#### VLANs Creadas - Edificio Derecho
 
 **(Configuradas en SW(0)1_G28)**
 
@@ -736,7 +736,7 @@ exit
 copy running-config startup-config
 ```
 
-### Evidencia de Propagación
+#### Evidencia de Propagación
 
 Se verificó en los switches de borde que las VLANs fueron recibidas correctamente mediante VTP, gracias al comando `show vlan brief`, confirmando que todas las VLANs creadas en los servidores están presentes en los clientes.
 
@@ -747,11 +747,11 @@ Se verificó en los switches de borde que las VLANs fueron recibidas correctamen
 - Edificio Derecho (Ejemplo en SW(3)1_G28):
   ![Verificación VLANs Edificio Derecho](<img/vlan//S(3)1_vlan.png>)
 
-### Asignación de Puertos de Acceso
+#### Asignación de Puertos de Acceso
 
 Se configuraron las interfaces de red que conectan a los dispositivos finales en modo `access` y se asignaron a las VLANs correspondientes según la segmentación lógica (Primaria, Básicos, Bachillerato) y la ubicación física (Puerto Fa0/22 o Fa0/23).
 
-### Tabla de Asignación - Edificio Izquierdo
+#### Tabla de Asignación - Edificio Izquierdo
 
 | Dispositivo  | Interfaz | Equipo Final | Perfil/VLAN Asignada   |
 | :----------- | :------- | :----------- | :--------------------- |
@@ -821,7 +821,7 @@ exit
 copy running-config startup-config
 ```
 
-### Tabla de Asignación - Edificio Derecho
+#### Tabla de Asignación - Edificio Derecho
 
 | Dispositivo     | Interfaz | Equipo Final | Perfil/VLAN Asignada   |
 | :-------------- | :------- | :----------- | :--------------------- |
@@ -891,7 +891,7 @@ exit
 copy running-config startup-config
 ```
 
-### Verificación de Asignación
+#### Verificación de Asignación
 
 Para verificar que los puertos de acceso están correctamente asignados a las VLANs, se utilizó el comando `show vlan brief` en cada switch, confirmando que las interfaces correspondientes están en modo access y asignadas a la VLAN correcta.
 
@@ -902,18 +902,18 @@ Para verificar que los puertos de acceso están correctamente asignados a las VL
 - Edificio Derecho (Ejemplo en SW(7)1_G28):
   ![Verificación Asignación Edificio Derecho](<img/vlan/S(7)1_vlan.png>)
 
-## 9.4 Seguridad de Puertos (Port Security)
+### 9.4 Seguridad de Puertos (Port Security)
 
 Siguiendo las políticas de seguridad establecidas, se configuró `port-security` en las interfaces de acceso pertenecientes a la VLAN de **Básicos**. Esta medida previene que usuarios no autorizados conecten dispositivos ajenos a la red o utilicen hubs para extender la red.
 
-### Políticas Aplicadas
+#### Políticas Aplicadas
 
 1.  **Activación:** Se habilitó la seguridad en el puerto.
 2.  **Límite:** Máximo **1 dirección MAC** permitida por puerto.
 3.  **Aprendizaje:** Se configuró `mac-address sticky` para que el switch aprenda la MAC del dispositivo legítimo conectado actualmente y la guarde en la configuración.
 4.  **Acción de Violación:** Modo `shutdown`. Si se detecta una MAC diferente o más de una, el puerto se apagará automáticamente.
 
-### Puertos Protegidos
+#### Puertos Protegidos
 
 | Edificio  | Dispositivo | Interfaz | VLAN         | Equipo Autorizado |
 | :-------- | :---------- | :------- | :----------- | :---------------- |
@@ -921,7 +921,7 @@ Siguiendo las políticas de seguridad establecidas, se configuró `port-security
 | Derecho   | SW(7)1_G28  | Fa0/22   | 71 (Básicos) | PC7               |
 | Derecho   | SW(8)1_G28  | Fa0/23   | 71 (Básicos) | Laptop2           |
 
-### Comandos Utilizados
+#### Comandos Utilizados
 
 **Configuración en Edificio Izquierdo**
 
@@ -972,7 +972,7 @@ exit
 do write memory
 ```
 
-### Verificación de Port Security
+#### Verificación de Port Security
 
 Para verificar la correcta configuración de `port-security`, se utilizó el comando `show port-security interface [interfaz]` en cada switch, confirmando que la seguridad está habilitada, el límite de MACs es correcto, la acción de violación es `shutdown` y que la MAC del dispositivo autorizado ha sido aprendida y guardada.
 
