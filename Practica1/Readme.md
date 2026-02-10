@@ -609,6 +609,7 @@ Para verificar la correcta configuración de los enlaces troncales, se utilizó 
   ![Verificación Trunks Edificio Izquierdo](img/trunk/SW3_trunl.png)
 
 - Edificio Derecho (Ejemplo en SW(0)1_G28):
+
   ![Verificación Trunks Edificio Derecho](<img/trunk/SW(0)1_trunk.png>)
 
 - Edificio Derecho (Ejemplo en SW(4)1_G28):
@@ -645,7 +646,7 @@ Para cumplir con el diseño jerárquico y proteger la red, se asignaron los sigu
 
 ```bash
 configure terminal
-vtp domain redes2_G28
+vtp domain G28
 vtp password redes2grupo28
 vtp mode server
 copy running-config startup-config
@@ -655,7 +656,7 @@ copy running-config startup-config
 
 ```bash
 configure terminal
-vtp domain redes2_G28
+vtp domain G28
 vtp password redes2grupo28
 vtp mode client
 copy running-config startup-config
@@ -667,7 +668,7 @@ Para verificar la correcta configuración y propagación de VLANs mediante VTP, 
 
 - Edificio Izquierdo (Ejemplo en SW0_G28 - Servidor):
 
-![Verificación VTP Edificio Izquierdo](img/vtp/SW0_vtp.png)
+![Verificación VTP Edificio Izquierdo](img/vtp/SW0_Vtp.png)
 
 - Edificio Izquierdo (Ejemplo en SW4_G28 - Cliente):
 
@@ -689,30 +690,30 @@ Se procedió a la creación de las VLANs en los switches servidores VTP. Gracias
 
 **(Configuradas en SW0_G28)**
 
-- **VLAN 31:** PRIMARIA
-- **VLAN 41:** BASICOS
-- **VLAN 51:** BACHILLERATO
+- **VLAN 11:** PRIMARIA
+- **VLAN 21:** BASICOS
+- **VLAN 31:** BACHILLERATO
 
 ### VLANs Creadas - Edificio Derecho
 
 **(Configuradas en SW(0)1_G28)**
 
-- **VLAN 81:** PRIMARIA
-- **VLAN 91:** BASICOS
-- **VLAN 101:** BACHILLERATO
+- **VLAN 61:** PRIMARIA
+- **VLAN 71:** BASICOS
+- **VLAN 81:** BACHILLERATO
 
 **En Edificio Izquierdo (Switch0 / SW0_G28):**
 
 ```bash
 enable
 configure terminal
-vlan 31
+vlan 11
 name PRIMARIA
 exit
-vlan 41
+vlan 21
 name BASICOS
 exit
-vlan 51
+vlan 31
 name BACHILLERATO
 exit
 copy running-config startup-config
@@ -723,13 +724,13 @@ copy running-config startup-config
 ```bash
 enable
 configure terminal
-vlan 81
+vlan 61
 name PRIMARIA
 exit
-vlan 91
+vlan 71
 name BASICOS
 exit
-vlan 101
+vlan 81
 name BACHILLERATO
 exit
 copy running-config startup-config
@@ -744,7 +745,7 @@ Se verificó en los switches de borde que las VLANs fueron recibidas correctamen
   ![Verificación VLANs Edificio Izquierdo](img/vlan/S4_vlan.png)
 
 - Edificio Derecho (Ejemplo en SW(3)1_G28):
-  ![Verificación VLANs Edificio Derecho](<img/vlan/S(3)1_vlan.png>)
+  ![Verificación VLANs Edificio Derecho](<img/vlan//S(3)1_vlan.png>)
 
 ### Asignación de Puertos de Acceso
 
@@ -754,26 +755,235 @@ Se configuraron las interfaces de red que conectan a los dispositivos finales en
 
 | Dispositivo  | Interfaz | Equipo Final | Perfil/VLAN Asignada   |
 | :----------- | :------- | :----------- | :--------------------- |
-| **SW7_G28**  | Fa0/22   | PC1          | Básicos (VLAN 41)      |
-| **SW6_G28**  | Fa0/22   | PC2          | Bachillerato (VLAN 51) |
-| **SW8_G28**  | Fa0/23   | Laptop1      | Bachillerato (VLAN 51) |
-| **SW9_G28**  | Fa0/22   | PC4          | Primaria (VLAN 31)     |
-| **SW10_G28** | Fa0/22   | PC5          | Primaria (VLAN 31)     |
+| **SW7_G28**  | Fa0/22   | PC1          | Básicos (VLAN 21)      |
+| **SW6_G28**  | Fa0/22   | PC2          | Bachillerato (VLAN 31) |
+| **SW8_G28**  | Fa0/23   | Laptop1      | Bachillerato (VLAN 31) |
+| **SW9_G28**  | Fa0/22   | PC4          | Primaria (VLAN 11)     |
+| **SW10_G28** | Fa0/22   | PC5          | Primaria (VLAN 11)     |
+
+**1. Switch7 (SW7_G28) - PC1 (Básicos - VLAN 21)**
+
+```bash
+enable
+configure terminal
+interface fa0/22
+switchport mode access
+switchport access vlan 21
+exit
+copy running-config startup-config
+```
+
+**2. Switch6 (SW6_G28) - PC2 (Bachillerato - VLAN 31)**
+
+```bash
+enable
+configure terminal
+interface fa0/22
+switchport mode access
+switchport access vlan 31
+exit
+copy running-config startup-config
+```
+
+**3. Switch8 (SW8_G28) - Laptop1 (Bachillerato - VLAN 31)**
+
+```bash
+enable
+configure terminal
+interface fa0/23
+switchport mode access
+switchport access vlan 31
+exit
+copy running-config startup-config
+```
+
+**4. Switch9 (SW9_G28) - PC4 (Primaria - VLAN 11)**
+
+```bash
+enable
+configure terminal
+interface fa0/22
+switchport mode access
+switchport access vlan 11
+exit
+copy running-config startup-config
+```
+
+**5. Switch10 (SW10_G28) - PC5 (Primaria - VLAN 11)**
+
+```bash
+enable
+configure terminal
+interface fa0/22
+switchport mode access
+switchport access vlan 11
+exit
+copy running-config startup-config
+```
 
 ### Tabla de Asignación - Edificio Derecho
 
-| Dispositivo     | Interfaz | Equipo Final | Perfil/VLAN Asignada    |
-| :-------------- | :------- | :----------- | :---------------------- |
-| **SW(6)1_G28**  | Fa0/22   | PC6          | Bachillerato (VLAN 101) |
-| **SW(7)1_G28**  | Fa0/22   | PC7          | Básicos (VLAN 91)       |
-| **SW(8)1_G28**  | Fa0/23   | Laptop2      | Básicos (VLAN 91)       |
-| **SW(9)1_G28**  | Fa0/22   | PC3          | Primaria (VLAN 81)      |
-| **SW(10)1_G28** | Fa0/22   | PC8          | Primaria (VLAN 81)      |
+| Dispositivo     | Interfaz | Equipo Final | Perfil/VLAN Asignada   |
+| :-------------- | :------- | :----------- | :--------------------- |
+| **SW(6)1_G28**  | Fa0/22   | PC6          | Bachillerato (VLAN 81) |
+| **SW(7)1_G28**  | Fa0/22   | PC7          | Básicos (VLAN 71)      |
+| **SW(8)1_G28**  | Fa0/23   | Laptop2      | Básicos (VLAN 71)      |
+| **SW(9)1_G28**  | Fa0/22   | PC3          | Primaria (VLAN 61)     |
+| **SW(10)1_G28** | Fa0/22   | PC8          | Primaria (VLAN 61)     |
 
-**Comando utilizado (Ejemplo):**
+**1. Switch(6)1 (SW(6)1_G28) - PC6 (Bachillerato - VLAN 81)**
 
 ```bash
+enable
+configure terminal
 interface fa0/22
 switchport mode access
-switchport access vlan [ID_VLAN]
+switchport access vlan 81
+exit
+copy running-config startup-config
 ```
+
+**2. Switch(7)1 (SW(7)1_G28) - PC7 (Básicos - VLAN 71)**
+
+```bash
+enable
+configure terminal
+interface fa0/22
+switchport mode access
+switchport access vlan 71
+exit
+copy running-config startup-config
+```
+
+**3. Switch(8)1 (SW(8)1_G28) - Laptop2 (Básicos - VLAN 71)**
+
+```bash
+enable
+configure terminal
+interface fa0/23
+switchport mode access
+switchport access vlan 71
+exit
+copy running-config startup-config
+```
+
+**4. Switch(9)1 (SW(9)1_G28) - PC3 (Primaria - VLAN 61)**
+
+```bash
+enable
+configure terminal
+interface fa0/22
+switchport mode access
+switchport access vlan 61
+exit
+copy running-config startup-config
+```
+
+**5. Switch(10)1 (SW(10)1_G28) - PC8 (Primaria - VLAN 61)**
+
+```bash
+enable
+configure terminal
+interface fa0/22
+switchport mode access
+switchport access vlan 61
+exit
+copy running-config startup-config
+```
+
+### Verificación de Asignación
+
+Para verificar que los puertos de acceso están correctamente asignados a las VLANs, se utilizó el comando `show vlan brief` en cada switch, confirmando que las interfaces correspondientes están en modo access y asignadas a la VLAN correcta.
+
+- Edificio Izquierdo (Ejemplo en SW9_G28):
+
+  ![Verificación Asignación Edificio Izquierdo](img/vlan/S9_vlan.png)
+
+- Edificio Derecho (Ejemplo en SW(7)1_G28):
+  ![Verificación Asignación Edificio Derecho](<img/vlan/S(7)1_vlan.png>)
+
+## 9.4 Seguridad de Puertos (Port Security)
+
+Siguiendo las políticas de seguridad establecidas, se configuró `port-security` en las interfaces de acceso pertenecientes a la VLAN de **Básicos**. Esta medida previene que usuarios no autorizados conecten dispositivos ajenos a la red o utilicen hubs para extender la red.
+
+### Políticas Aplicadas
+
+1.  **Activación:** Se habilitó la seguridad en el puerto.
+2.  **Límite:** Máximo **1 dirección MAC** permitida por puerto.
+3.  **Aprendizaje:** Se configuró `mac-address sticky` para que el switch aprenda la MAC del dispositivo legítimo conectado actualmente y la guarde en la configuración.
+4.  **Acción de Violación:** Modo `shutdown`. Si se detecta una MAC diferente o más de una, el puerto se apagará automáticamente.
+
+### Puertos Protegidos
+
+| Edificio  | Dispositivo | Interfaz | VLAN         | Equipo Autorizado |
+| :-------- | :---------- | :------- | :----------- | :---------------- |
+| Izquierdo | SW7_G28     | Fa0/22   | 21 (Básicos) | PC1               |
+| Derecho   | SW(7)1_G28  | Fa0/22   | 71 (Básicos) | PC7               |
+| Derecho   | SW(8)1_G28  | Fa0/23   | 71 (Básicos) | Laptop2           |
+
+### Comandos Utilizados
+
+**Configuración en Edificio Izquierdo**
+
+**1.En Switch7 (SW7_G28)**
+
+```bash
+enable
+configure terminal
+interface fa0/22
+switchport mode access
+switchport port-security
+switchport port-security maximum 1
+switchport port-security violation shutdown
+switchport port-security mac-address sticky
+exit
+do write memory
+```
+
+**Configuración en Edificio Derecho**
+
+**2. En Switch(7)1 (SW(7)1_G28)**
+
+```bash
+enable
+configure terminal
+interface fa0/22
+switchport mode access
+switchport port-security
+switchport port-security maximum 1
+switchport port-security violation shutdown
+switchport port-security mac-address sticky
+exit
+do write memory
+```
+
+**3. En Switch(8)1 (SW(8)1_G28)**
+
+```bash
+enable
+configure terminal
+interface fa0/23
+switchport mode access
+switchport port-security
+switchport port-security maximum 1
+switchport port-security violation shutdown
+switchport port-security mac-address sticky
+exit
+do write memory
+```
+
+### Verificación de Port Security
+
+Para verificar la correcta configuración de `port-security`, se utilizó el comando `show port-security interface [interfaz]` en cada switch, confirmando que la seguridad está habilitada, el límite de MACs es correcto, la acción de violación es `shutdown` y que la MAC del dispositivo autorizado ha sido aprendida y guardada.
+
+- Edificio Izquierdo (Ejemplo en SW7_G28):
+
+  ![Verificación Port Security Edificio Izquierdo](img/port/SW7_port.png)
+
+- Edificio Derecho (Ejemplo en SW(7)1_G28):
+
+  ![Verificación Port Security Edificio Derecho](<img/port/SW(7)1_port.png>)
+
+- Edificio Derecho (Ejemplo en SW(8)1_G28):
+
+  ![Verificación Port Security Edificio Derecho](<img/port/SW(8)1_port.png>)
