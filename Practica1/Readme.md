@@ -902,6 +902,30 @@ Para verificar que los puertos de acceso están correctamente asignados a las VL
 - Edificio Derecho (Ejemplo en SW(7)1_G28):
   ![Verificación Asignación Edificio Derecho](<img/vlan/S(7)1_vlan.png>)
 
+#### Direccionamiento IP - Edificio Izquierdo
+
+A continuación se presenta la tabla de direccionamiento IP asignada a los dispositivos finales del Edificio Izquierdo:
+
+| Dispositivo | VLAN (ID)          | Dirección IP   | Máscara de Subred | Default Gateway |
+| :---------- | :----------------- | :------------- | :---------------- | :-------------- |
+| PC4         | Primaria (11)      | 192.178.11.10  | 255.255.255.0     | 192.178.11.1    |
+| PC5         | Primaria (11)      | 192.178.11.11  | 255.255.255.0     | 192.178.11.1    |
+| PC1         | Básicos (21)       | 192.178.21.10  | 255.255.255.0     | 192.178.21.1    |
+| PC2         | Bachillerato (31)  | 192.178.31.10  | 255.255.255.0     | 192.178.31.1    |
+| Laptop1     | Bachillerato (31)  | 192.178.31.11  | 255.255.255.0     | 192.178.31.1    |
+
+#### Direccionamiento IP - Edificio Derecho
+
+A continuación se presenta la tabla de direccionamiento IP asignada a los dispositivos finales del Edificio Derecho:
+
+| Dispositivo | VLAN (ID)          | Dirección IP   | Máscara de Subred | Default Gateway |
+| :---------- | :----------------- | :------------- | :---------------- | :-------------- |
+| PC3         | Primaria (61)      | 192.178.61.10  | 255.255.255.0     | 192.178.61.1    |
+| PC8         | Primaria (61)      | 192.178.61.11  | 255.255.255.0     | 192.178.61.1    |
+| PC7         | Básicos (71)       | 192.178.71.10  | 255.255.255.0     | 192.178.71.1    |
+| Laptop2     | Básicos (71)       | 192.178.71.11  | 255.255.255.0     | 192.178.71.1    |
+| PC6         | Bachillerato (81)  | 192.178.81.10  | 255.255.255.0     | 192.178.81.1    |
+
 ### 9.4 Seguridad de Puertos (Port Security)
 
 Siguiendo las políticas de seguridad establecidas, se configuró `port-security` en las interfaces de acceso pertenecientes a la VLAN de **Básicos**. Esta medida previene que usuarios no autorizados conecten dispositivos ajenos a la red o utilicen hubs para extender la red.
@@ -987,3 +1011,132 @@ Para verificar la correcta configuración de `port-security`, se utilizó el com
 - Edificio Derecho (Ejemplo en SW(8)1_G28):
 
   ![Verificación Port Security Edificio Derecho](<img/port/SW(8)1_port.png>)
+
+
+## 10. Configuración de STP (Spanning Tree Protocol)
+
+### 10.1 Edificio Izquierdo: PVST (Per-VLAN Spanning Tree)
+
+El Switch0 (SW0_G28) es el jefe (Root Bridge) de todas las VLANs de este lado (11, 21, 31), ya que es el que está conectado al Router.
+
+**Comandos para el Switch Principal (SW0_G28):**
+
+```Bash
+enable
+configure terminal
+spanning-tree mode pvst
+spanning-tree vlan 11,21,31 root primary
+exit
+write
+```
+
+**Comandos para el Switch Secundario (SW1_G28):**
+
+Este seria un backup por si falla el switch principal
+
+```Bash
+enable
+configure terminal
+spanning-tree mode pvst
+spanning-tree vlan 11,21,31 root secondary
+exit
+write
+```
+
+**Comando para todos los demás switches del lado izquierdo**
+
+```bash
+enable
+configure terminal
+spanning-tree mode pvst
+exit
+write
+```
+
+### 10.2 Edificio Derecho: Rapid-PVST
+
+El Switch0 (SW(0)1_G28) es el jefe (Root Bridge) de todas las VLANs de este lado (61, 71, 81), ya que es el que está conectado al Router.
+
+**Comandos para el Switch Principal (SW(0)1_G28):**
+
+```Bash
+enable
+configure terminal
+spanning-tree mode rapid-pvst
+spanning-tree vlan 61,71,81 root primary
+exit
+write
+```
+
+**Comandos para el Switch Secundario (SW(1)1_G28):**
+
+Este seria un backup por si falla el switch principal
+
+```Bash
+enable
+configure terminal
+spanning-tree mode rapid-pvst
+spanning-tree vlan 61,71,81 root secondary
+exit
+write
+```
+
+**Comando para todos los demás switches del lado derecho**
+
+```bash
+enable
+configure terminal
+spanning-tree mode rapid-pvst
+exit
+write
+```
+
+
+
+### 10.3 Estudio de Convergencia
+
+Se realizaron pruebas de estrés simulando la caída de un enlace troncal principal para medir el tiempo que tarda la red en recalcular la topología y restaurar el tráfico de usuarios.
+
+#### 10.3.1 Lado Izquierdo
+**Metodología de prueba:**
+
+- Se identificó un puerto en estado Blocking (Naranja) en la capa de acceso.
+
+![Estado en blocking](img/stp/izquierda.png)
+
+- Se inició un ping continuo entre dos hosts de la misma VLAN. (En este caso de la PC4 a la PC5)
+
+![Ping Continuo](img/stp/izquierda1.png)
+
+- Se desconectó físicamente el enlace Forwarding (Verde) principal.
+
+![Desconexión física](img/stp/izquierda2.png)
+
+
+- Se cronometró el tiempo hasta que el puerto de respaldo pasó a estado Forwarding y el ping respondió nuevamente. El tiempo que tardó en recuperar la conexión fue de alrededor de 42 segundos. 
+
+![Cronometro](img/stp/izquierda3.png)
+
+**Tabla de Resultados**
+
+#### 10.3.2 Lado Derecho
+
+**Metodología de prueba:**
+
+- Se identificó un puerto en estado Blocking (Naranja) en la capa de acceso.
+
+![Estado en blocking](img/stp/derecha.png)
+
+- Se inició un ping continuo entre dos hosts de la misma VLAN. (En esta caso de la PC3 a la PC8)
+
+![Ping Continuo](img/stp/derecha1.png)
+
+- Se desconectó físicamente el enlace Forwarding (Verde) principal.
+
+![Desconexión física](img/stp/derecha2.png)
+
+- Se cronometró el tiempo hasta que el puerto de respaldo pasó a estado Forwarding y el ping respondió nuevamente. El tiempo fue tan corto que se consideró innecesario el colocar un cronómetro y cálculos del tiempo, pues fue casi inmediato.
+
+
+
+**Tabla de Resultados**
