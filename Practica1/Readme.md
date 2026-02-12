@@ -1238,3 +1238,9 @@ En un contexto de educación formal como el Colegio Monte Alto, la continuidad d
   - **Escalabilidad**: Mejor desempeño en redes complejas con múltiples VLANs
 
 Por lo tanto, **Rapid-PVST es la solución recomendada para garantizar la máxima disponibilidad de la infraestructura de red del Colegio Monte Alto**.
+
+
+
+
+
+
