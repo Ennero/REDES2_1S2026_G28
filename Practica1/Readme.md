@@ -20,6 +20,20 @@ Periodo: Primer Semestre 2026
 | 202202410 | Marcos Daniel Bonifasi de Leon |
 | 202300670 | David Estuardo Barrios Ramírez |
 
+## Índice
+
+- [1. Introducción](#1-introducción)
+- [2. Objetivo General](#2-objetivo-general)
+- [3. Objetivos Específicos](#3-objetivos-específicos)
+- [4. Alcance del Proyecto](#4-alcance-del-proyecto)
+- [5. Metodología de Trabajo](#5-metodología-de-trabajo)
+- [6. Herramientas y Recursos Utilizados](#6-herramientas-y-recursos-utilizados)
+- [7. Diseño de la Topología de Red](#7-diseño-de-la-topología-de-red)
+- [8. Configuración Básica de Switches](#8-configuración-básica-de-switches)
+- [9. Configuración del Protocolo VTP y Troncales](#9-configuración-del-protocolo-vtp-y-troncales)
+- [10. Configuración de STP (Spanning Tree Protocol)](#10-configuración-de-stp-spanning-tree-protocol)
+- [11. Enrutamiento Dinámico e Interconexión (Capa 3)](#11-enrutamiento-dinámico-e-interconexión-capa-3)
+
 ## 1. Introducción
 
 La presente documentación corresponde al desarrollo de la Práctica 1: “Monte Alto y la conectividad”, cuyo objetivo es el diseño, implementación y validación de una red LAN segmentada y segura, utilizando Cisco Packet Tracer como herramienta de simulación.
@@ -144,9 +158,9 @@ La topología principal se compone de dos edificios interconectados a través de
 
 | Dispositivo Origen | Puerto Origen | Dispositivo Destino | Puerto Destino |
 | ------------------ | ------------- | ------------------- | -------------- |
-| Router0            | Gig0/0        | Router1             | Gig0/0         |
-| Router1            | Gig0/1        | Router4             | Gig0/0         |
-| Router4            | Gig0/1        | Router3             | Gig0/0         |
+| Router0            | g0/0          | Router1             | g0/0           |
+| Router1            | g0/1          | Router4             | g0/0           |
+| Router4            | g0/1          | Router3             | g0/0           |
 
 #### 7.3.2 Enlaces entre dispositivos - Edificio Izquierdo
 
@@ -154,7 +168,7 @@ La topología principal se compone de dos edificios interconectados a través de
 
 | Dispositivo Origen | Puerto Origen | Dispositivo Destino | Puerto Destino |
 | ------------------ | ------------- | ------------------- | -------------- |
-| Router0            | Gig0/1        | Switch0             | Gig0/1         |
+| Router0            | g0/1          | Switch0             | g0/1           |
 
 **Nivel 2:**
 
@@ -206,7 +220,7 @@ La topología principal se compone de dos edificios interconectados a través de
 
 | Dispositivo Origen | Puerto Origen | Dispositivo Destino | Puerto Destino |
 | ------------------ | ------------- | ------------------- | -------------- |
-| Router3            | Gig0/1        | Switch(0)1          | Gig0/1         |
+| Router3            | g0/1          | Switch(0)1          | g0/1           |
 
 **Nivel 2:**
 
@@ -1240,7 +1254,435 @@ En un contexto de educación formal como el Colegio Monte Alto, la continuidad d
 Por lo tanto, **Rapid-PVST es la solución recomendada para garantizar la máxima disponibilidad de la infraestructura de red del Colegio Monte Alto**.
 
 
+## 11. Enrutamiento Dinámico e Interconexión (Capa 3)
 
+Esta sección documenta la implementación de **Capa 3** para el **Grupo 28**, enfocada en el enrutamiento dinámico, la conectividad total entre VLANs y la interoperabilidad entre dominios de routing.
 
+### 11.1 Descripción general de la Capa 3
 
+La Capa 3 se implementó para habilitar:
 
+- **Enrutamiento dinámico** entre edificios y routers core, utilizando **EIGRP**, **RIP v2** y **OSPF** según el tramo.
+- **Interconexión entre VLANs (Inter-VLAN Routing)** dentro de cada edificio, permitiendo que las redes de usuarios segmentadas por VLAN se comuniquen entre sí.
+- **Conectividad extremo a extremo** (host a host) entre ambos edificios, asegurando que cualquier VLAN del edificio izquierdo pueda comunicarse con cualquier VLAN del edificio derecho a través de la red WAN y los routers core.
+
+La topología de Capa 3 se diseñó con 4 routers:
+
+- **R0_G28 (Edificio Izquierdo)**: gateway de VLANs IZQ + dominio **EIGRP**.
+- **R1_G28 (Core 1)**: frontera **EIGRP ↔ RIP** (redistribución unidireccional EIGRP → RIP).
+- **R4_G28 (Core 2)**: frontera **RIP ↔ OSPF** (redistribución bidireccional RIP ↔ OSPF).
+- **R3_G28 (Edificio Derecho)**: gateway de VLANs DER + dominio **OSPF**.
+
+### 11.2 Direccionamiento IP (Grupo 28)
+
+Para mantener consistencia en el direccionamiento, se utilizó la siguiente fórmula definida por el enunciado:
+
+- **Grupo 28 → 2 + 8 = 10 → 1**
+
+Con base en ello, el direccionamiento se asignó con:
+
+- VLANs en el rango **192.178.X.0/24**, donde $X$ identifica la VLAN.
+- Redes WAN en el rango **10.8.Y.0/24**, donde $Y$ identifica el tramo/protocolo.
+
+#### 11.2.1 VLANs y Gateways
+
+En cada VLAN, el gateway se asignó como **.1** (subinterfaz del router del edificio).
+
+| VLAN / Segmento | Red (CIDR)         | Gateway (Router-on-a-Stick) |
+|---|---|---|
+| Primaria IZQ     | 192.178.11.0/24     | 192.178.11.1 |
+| Básicos IZQ      | 192.178.21.0/24     | 192.178.21.1 |
+| Bachillerato IZQ | 192.178.31.0/24     | 192.178.31.1 |
+| Primaria DER     | 192.178.61.0/24     | 192.178.61.1 |
+| Básicos DER      | 192.178.71.0/24     | 192.178.71.1 |
+| Bachillerato DER | 192.178.81.0/24     | 192.178.81.1 |
+
+#### 11.2.2 Redes WAN por protocolo
+
+Se asignó una red WAN independiente por tramo de enrutamiento para aislar dominios y simplificar verificación.
+
+| Tramo / Protocolo | Red WAN (CIDR) |
+|---|---|
+| EIGRP (R0 ↔ R1)   | 10.8.4.0/24 |
+| RIP (R1 ↔ R4)     | 10.8.3.0/24 |
+| OSPF (R4 ↔ R3)    | 10.8.2.0/24 |
+
+> Nota: En los enlaces WAN se utiliza /24 por requerimiento/práctica en Packet Tracer; en entornos reales se prefiere /30 o /31 para enlaces punto-a-punto.
+
+### 11.3 Inter-VLAN Routing
+
+Para el enrutamiento entre VLANs en cada edificio se aplicó **Router-on-a-Stick**, donde:
+
+- El enlace **Switch Distribución ↔ Router** está configurado como **trunk 802.1Q**.
+- En el router, se crean **subinterfaces** (por VLAN), cada una con:
+  - `encapsulation dot1Q <VLAN_ID>`
+  - IP gateway **.1** para esa red
+
+#### 11.3.1 Ejemplo de subinterfaces (plantilla)
+
+El siguiente ejemplo representa la estructura usada (cambiando VLAN/Red según corresponda):
+
+```bash
+enable
+configure terminal
+
+interface g0/1
+ no shutdown
+
+interface g0/1.11
+ encapsulation dot1Q 11
+ ip address 192.178.11.1 255.255.255.0
+
+interface g0/1.21
+ encapsulation dot1Q 21
+ ip address 192.178.21.1 255.255.255.0
+
+interface g0/1.31
+ encapsulation dot1Q 31
+ ip address 192.178.31.1 255.255.255.0
+
+end
+write memory
+```
+
+### 11.4 Configuración de routers (por router)
+
+En esta sección se documentan comandos IOS **limpios** y **ordenados** tal como fueron aplicados. Los nombres de interfaces pueden variar según el cableado del archivo `.pkt`, pero el criterio de configuración se mantiene.
+
+#### 11.4.1 Router R0_G28 – Edificio Izquierdo (EIGRP)
+
+**Rol:**
+
+- Gateway de VLAN 11/21/31 mediante Router-on-a-Stick.
+- Participación en **EIGRP AS 100** hacia el core (R1_G28).
+
+**Configuración (referencial):**
+
+```bash
+enable
+configure terminal
+hostname R0_G28
+
+! Trunk hacia switches (Router-on-a-Stick)
+interface g0/1
+ no shutdown
+
+interface g0/1.11
+ encapsulation dot1Q 11
+ ip address 192.178.11.1 255.255.255.0
+
+interface g0/1.21
+ encapsulation dot1Q 21
+ ip address 192.178.21.1 255.255.255.0
+
+interface g0/1.31
+ encapsulation dot1Q 31
+ ip address 192.178.31.1 255.255.255.0
+
+! WAN hacia R1 (dominio EIGRP)
+interface g0/0
+ ip address 10.8.4.1 255.255.255.0
+ no shutdown
+
+router eigrp 100
+ no auto-summary
+ network 10.8.4.0 0.0.0.255
+ network 192.178.11.0 0.0.0.255
+ network 192.178.21.0 0.0.0.255
+ network 192.178.31.0 0.0.0.255
+end
+write memory
+```
+
+#### 11.4.2 Router R1_G28 – Core 1 (EIGRP ↔ RIP)
+
+**Rol:**
+
+- Conecta el dominio **EIGRP** (hacia R0_G28) con el dominio **RIP** (hacia R4_G28).
+- Ejecuta **RIP v2**.
+- Realiza **redistribución EIGRP → RIP** para propagar las redes VLAN del edificio izquierdo hacia el resto de la topología.
+
+**Configuración (referencial):**
+
+```bash
+enable
+configure terminal
+hostname R1_G28
+
+! WAN hacia R0 (EIGRP)
+interface g0/0
+ ip address 10.8.4.2 255.255.255.0
+ no shutdown
+
+! WAN hacia R4 (RIP)
+interface g0/1
+ ip address 10.8.3.1 255.255.255.0
+ no shutdown
+
+router eigrp 100
+ no auto-summary
+ network 10.8.4.0 0.0.0.255
+
+router rip
+ version 2
+ no auto-summary
+ network 10.0.0.0
+
+! Redistribución: EIGRP -> RIP
+router rip
+ redistribute eigrp 100 metric 2
+
+end
+write memory
+```
+
+> Nota técnica: En redistribución hacia RIP se define métrica (saltos) porque RIP requiere un valor explícito. En Packet Tracer, `metric 2` es suficiente para visibilidad y convergencia en esta práctica.
+
+#### 11.4.3 Router R4_G28 – Core 2 (RIP ↔ OSPF)
+
+**Rol:**
+
+- Conecta el dominio **RIP** (desde R1_G28) con el dominio **OSPF** (hacia R3_G28).
+- Corre **OSPF área 0** hacia el edificio derecho.
+- Realiza **redistribución RIP ↔ OSPF** para intercambiar rutas entre ambos dominios.
+
+**Configuración (referencial):**
+
+```bash
+enable
+configure terminal
+hostname R4_G28
+
+! WAN hacia R1 (RIP)
+interface g0/0
+ ip address 10.8.3.2 255.255.255.0
+ no shutdown
+
+! WAN hacia R3 (OSPF)
+interface g0/1
+ ip address 10.8.2.1 255.255.255.0
+ no shutdown
+
+router rip
+ version 2
+ no auto-summary
+ network 10.0.0.0
+
+router ospf 1
+ network 10.8.2.0 0.0.0.255 area 0
+
+! Redistribución bidireccional
+router ospf 1
+ redistribute rip subnets
+
+router rip
+ redistribute ospf 1 metric 2
+
+end
+write memory
+```
+
+#### 11.4.4 Router R3_G28 – Edificio Derecho (OSPF)
+
+**Rol:**
+
+- Gateway de VLAN 61/71/81 mediante Router-on-a-Stick.
+- Participación en **OSPF área 0** hacia el core (R4_G28).
+
+**Configuración (referencial):**
+
+```bash
+enable
+configure terminal
+hostname R3_G28
+
+! Trunk hacia switches (Router-on-a-Stick)
+interface g0/1
+ no shutdown
+
+interface g0/1.61
+ encapsulation dot1Q 61
+ ip address 192.178.61.1 255.255.255.0
+
+interface g0/1.71
+ encapsulation dot1Q 71
+ ip address 192.178.71.1 255.255.255.0
+
+interface g0/1.81
+ encapsulation dot1Q 81
+ ip address 192.178.81.1 255.255.255.0
+
+! WAN hacia R4 (OSPF)
+interface g0/0
+ ip address 10.8.2.2 255.255.255.0
+ no shutdown
+
+router ospf 1
+ network 10.8.2.0 0.0.0.255 area 0
+ network 192.178.61.0 0.0.0.255 area 0
+ network 192.178.71.0 0.0.0.255 area 0
+ network 192.178.81.0 0.0.0.255 area 0
+
+end
+write memory
+```
+
+### 11.5 Evidencia de enrutamiento dinámico
+
+Las siguientes capturas corresponden a validaciones reales realizadas en la topología final. Se incluyen únicamente evidencias disponibles en el repositorio.
+
+#### 11.5.1 `show ip route` (tabla de enrutamiento)
+
+Estas capturas evidencian que cada router aprende rutas **remotas** mediante el protocolo correspondiente y/o mediante redistribución en los routers core.
+
+- **R0_G28 – show ip route**
+
+  ![R0 show ip route](img/routing/r0_sipr.png)
+
+- **R1_G28 – show ip route**
+
+  ![R1 show ip route](img/routing/r1_sipr.png)
+
+- **R4_G28 – show ip route**
+
+  ![R4 show ip route](img/routing/r4_sipr.png)
+
+- **R3_G28 – show ip route**
+
+  ![R3 show ip route](img/routing/r3_sipr.png)
+
+#### 11.5.2 `show ip protocols` (procesos activos y redistribución)
+
+Estas capturas demuestran qué protocolos están corriendo en cada equipo, las redes anunciadas y el efecto de la redistribución entre dominios.
+
+- **R0_G28 – show ip protocols**
+
+  ![R0 show ip protocols](img/routing/r0_sipp.png)
+
+- **R1_G28 – show ip protocols**
+
+  ![R1 show ip protocols](img/routing/r1_sipp.png)
+
+- **R4_G28 – show ip protocols**
+
+  ![R4 show ip protocols](img/routing/r4_sipp.png)
+
+- **R3_G28 – show ip protocols**
+
+  ![R3 show ip protocols](img/routing/r3_sipp.png)
+
+#### 11.5.3 `show ip ospf neighbor` (adyacencia OSPF)
+
+En el tramo **10.8.2.0/24** se valida la vecindad entre **R4_G28** y **R3_G28**. La presencia de un vecino OSPF confirma que:
+
+- La conectividad L3 del enlace WAN está operativa.
+- Los parámetros OSPF son compatibles y se formó la relación de vecindad.
+
+  ![R4 show ip ospf neighbor](img/routing/r4_sip_ospf_neighbor.png)
+
+### 11.6 Pruebas de conectividad
+
+Las pruebas de conectividad se validaron con capturas reales de `ping` (se documenta el origen y destino según el nombre del archivo). Estas pruebas cubren conectividad:
+
+- **Mismo VLAN (mismo edificio)**
+- **Inter-VLAN (mismo edificio)**
+- **Inter-edificio (VLANs distintas o equivalentes por nivel)**
+
+#### 11.6.1 Mismo VLAN (mismo edificio)
+
+Se valida conectividad dentro de la misma VLAN y mismo edificio (conmutación Capa 2). Evidencias:
+
+- **VLAN 11 (Primaria IZQ) – 192.178.11.10 → 192.178.11.11**
+  - Tipo: mismo VLAN / mismo edificio
+
+  ![Ping VLAN 11 IZQ](img/ping/192.178.11.10_to_192.178.11.11.png)
+
+- **VLAN 31 (Bachillerato IZQ) – 192.178.31.10 → 192.178.31.11**
+  - Tipo: mismo VLAN / mismo edificio
+
+  ![Ping VLAN 31 IZQ](img/ping/192.178.31.10_to_192.178.31.11.png)
+
+#### 11.6.2 Inter-edificio (conectividad extremo a extremo)
+
+Se valida tráfico extremo a extremo atravesando los dominios **EIGRP → RIP → OSPF**, confirmando aprendizaje de rutas y redistribución funcional. Evidencias:
+
+- **VLAN 11 IZQ → VLAN 71 DER – 192.178.11.10 → 192.178.71.11**
+  - Tipo: inter-edificio
+
+  ![Ping 11 a 71](img/ping/192.178.11.10_to_192.178.71.11.png)
+
+- **VLAN 11 IZQ → VLAN 61 DER – 192.178.11.11 → 192.178.61.11**
+  - Tipo: inter-edificio
+
+  ![Ping 11 a 61](img/ping/192.178.11.11_to_192.178.61.11.png)
+
+- **VLAN 31 IZQ → VLAN 61 DER – 192.178.31.10 → 192.178.61.10**
+  - Tipo: inter-edificio
+
+  ![Ping 31 a 61](img/ping/192.178.31.10_to_192.178.61.10.png)
+
+- **VLAN 31 IZQ → VLAN 81 DER – 192.178.31.11 → 192.178.81.10**
+  - Tipo: inter-edificio
+
+  ![Ping 31 a 81](img/ping/192.178.31.11_to_192.178.81.10.png)
+
+#### 11.6.3 Inter-VLAN
+
+Se valida el enrutamiento local (Router-on-a-Stick) entre VLANs distintas; en estas pruebas el tráfico debe pasar por el gateway `.1` (subinterfaces en `g0/1.*`). Evidencias:
+
+- **VLAN 21 (Básicos IZQ) → VLAN 71 (Básicos DER) – 192.178.21.10 → 192.178.71.10**
+  - Tipo: inter-VLAN + inter-edificio (ruta completa)
+
+  ![Ping 21 a 71](img/ping/192.178.21.10_to_192.178.71.10.png)
+
+- **VLAN 21 (Básicos IZQ) → VLAN 81 (Bachillerato DER) – 192.178.21.10 → 192.178.81.10**
+  - Tipo: inter-VLAN + inter-edificio
+
+  ![Ping 21 a 81](img/ping/192.178.21.10_to_192.178.81.10.png)
+
+#### Limitación de prueba en VLAN Básicos – mismo lado
+
+En la topología final, la VLAN **Básicos** del **edificio izquierdo (192.178.21.0/24)** cuenta físicamente con **un único host**.
+
+Por esta razón, **no es posible ejecutar una prueba “mismo VLAN / mismo edificio”** dentro de esa VLAN (no existe un segundo endpoint en el mismo segmento para validar host↔host). Esto **no** representa un fallo de configuración; es una limitante del diseño implementado.
+
+La conectividad de esa VLAN se valida mediante pruebas **más exigentes**, donde necesariamente se involucra enrutamiento y redistribución:
+
+- **Inter-VLAN / Inter-edificio:** 192.178.21.10 → 192.178.71.10
+- **Inter-VLAN / Inter-edificio:** 192.178.21.10 → 192.178.81.10
+
+Al existir respuesta exitosa en estas pruebas, se comprueba que:
+
+- El gateway `192.178.21.1` (subinterfaz en R0_G28) está operativo.
+- Las rutas hacia redes remotas se aprenden vía enrutamiento dinámico y redistribución.
+- El retorno (rutas de regreso) está correctamente resuelto en la topología.
+
+> Criterio de aceptación: 4/4 (o 5/5) respuestas exitosas y latencia estable dentro del simulador.
+
+### 11.7 Diagrama lógico de enrutamiento
+
+#### Diagrama lógico de enrutamiento
+
+El siguiente diagrama representa la estructura lógica de la red implementada, mostrando la interconexión entre los edificios y los protocolos de enrutamiento utilizados.
+No representa la topología física, sino el flujo del tráfico y la redistribución de rutas entre EIGRP, RIP y OSPF.
+
+![Diagrama lógico de enrutamiento](img/logical_routing_flow.png)
+
+El flujo lógico de enrutamiento (tráfico entre edificios) se compone de tres tramos WAN y tres dominios de routing:
+
+- **R0_G28 (EIGRP)** → **R1_G28 (EIGRP ↔ RIP)**
+  - Tramo WAN: **10.8.4.0/24**
+  - Protocolo activo en el tramo: **EIGRP AS 100**
+
+- **R1_G28 (RIP)** → **R4_G28 (RIP ↔ OSPF)**
+  - Tramo WAN: **10.8.3.0/24**
+  - Protocolo activo en el tramo: **RIP v2**
+
+- **R4_G28 (OSPF)** → **R3_G28 (OSPF)**
+  - Tramo WAN: **10.8.2.0/24**
+  - Protocolo activo en el tramo: **OSPF área 0**
+
+En términos de redistribución:
+
+- En **R1_G28** se redistribuyen rutas **EIGRP → RIP**, permitiendo que las redes VLAN del edificio izquierdo sean conocidas en RIP.
+- En **R4_G28** se redistribuyen rutas **RIP ↔ OSPF**, permitiendo propagación completa hacia el edificio derecho (OSPF) y retorno hacia el dominio RIP.
