@@ -16,7 +16,7 @@ Periodo: Primer Semestre 2026
 
 | Carné     |             Nombre             |
 | --------- | :----------------------------: |
-| 202302220 |  Enner Esaí Mendizabal Castro  |
+| 202302220 | Enner Esaí Mendizabal Castro   |
 | 202202410 | Marcos Daniel Bonifasi de Leon |
 | 202300670 | David Estuardo Barrios Ramírez |
 
@@ -285,6 +285,22 @@ hostname SW1_G28
 exit
 copy running-config startup-config
 ```
+
+**Configuración adicional para switches en modo servidor:**
+
+En los switches que operarán como servidores VTP (SW0_G28 y SW(0)1_G28), además del hostname, se configuró una contraseña de acceso privilegiado con cifrado:
+
+```bash
+enable
+configure terminal
+hostname SW0_G28
+enable secret redes2grupo28
+service password-encryption
+exit
+copy running-config startup-config
+```
+
+### 8.2 Tabla de Renombramiento de Dispositivos
 
 | Dispositivo Original | Nuevo Hostname |
 | -------------------- | -------------- |
@@ -1686,3 +1702,26 @@ En términos de redistribución:
 
 - En **R1_G28** se redistribuyen rutas **EIGRP → RIP**, permitiendo que las redes VLAN del edificio izquierdo sean conocidas en RIP.
 - En **R4_G28** se redistribuyen rutas **RIP ↔ OSPF**, permitiendo propagación completa hacia el edificio derecho (OSPF) y retorno hacia el dominio RIP.
+---
+
+## Anexo
+
+### Repositorio del Proyecto
+
+La implementación completa de esta práctica, incluyendo el archivo de simulación Cisco Packet Tracer (`.pkt`), documentación técnica, capturas de evidencia y configuraciones detalladas, se encuentra disponible en el siguiente repositorio de GitHub:
+
+🔗 **[https://github.com/Ennero/REDES2_1S2026_G28](https://github.com/Ennero/REDES2_1S2026_G28)**
+
+Este repositorio contiene:
+- Archivo de topología `Topologia.pkt` (Cisco Packet Tracer)
+- Documentación completa en formato Markdown (`Readme.md`)
+- Carpetas de evidencias con capturas organizadas por sección:
+  - `img/ping/` - Pruebas de conectividad
+  - `img/port/` - Configuración de Port Security
+  - `img/routing/` - Validación de enrutamiento dinámico
+  - `img/stp/` - Análisis de convergencia STP
+  - `img/trunk/` - Verificación de enlaces troncales
+  - `img/vlan/` - Configuración y propagación de VLANs
+  - `img/vtp/` - Configuración del protocolo VTP
+
+El proyecto se desarrolló colaborativamente utilizando control de versiones con Git, garantizando trazabilidad y respaldo de todas las configuraciones implementadas.
