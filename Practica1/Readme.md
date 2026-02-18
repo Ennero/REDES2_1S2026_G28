@@ -658,7 +658,7 @@ Se implementó el protocolo VTP versión 2 para centralizar la administración d
 
 | Parámetro   | Valor configurado | Descripción                                                          |
 | ----------- | ----------------- | -------------------------------------------------------------------- |
-| Dominio VTP | `redes2_G28`      | Identificador único del dominio administrativo.                      |
+| Dominio VTP | `G28`      | Identificador único del dominio administrativo.                      |
 | Contraseña  | `redes2grupo28`   | Clave MD5 para evitar que switches no autorizados alteren las VLANs. |
 | Versión     | `2`               | Versión por defecto compatible con la infraestructura actual.        |
 
