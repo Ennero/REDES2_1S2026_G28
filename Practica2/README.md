@@ -1479,3 +1479,151 @@ Los indicadores significan:
 - `P` — Puerto activo y formando parte del canal
 - `D` — Puerto caído, no forma parte del canal activo
 - `I` — Puerto independiente, no negoció correctamente con el extremo remoto
+
+## 12. Configuración HSRP
+
+**HSRP (Hot Standby Router Protocol)** es un protocolo propietario de Cisco definido en el RFC 2281 que proporciona redundancia de gateway en redes locales. Permite que dos o más routers compartan una **dirección IP virtual**, de manera que si el router activo falla, el router standby toma el control automáticamente sin interrumpir la conectividad de los dispositivos finales.
+
+En esta práctica, HSRP se configura en el **Data Center** para las VLANs 30 y 40, garantizando que si Router2 o Router3 fallan, los servidores sigan teniendo gateway disponible.
+
+Los roles son los siguientes:
+
+| Router  | VLAN 30 | VLAN 40 | Prioridad            |
+| ------- | ------- | ------- | -------------------- |
+| Router2 | Activo  | Activo  | 110 (mayor)          |
+| Router3 | Standby | Standby | 100 (menor, default) |
+
+Las IPs virtuales HSRP son:
+
+| VLAN                   | IP Virtual HSRP   | Uso                    |
+| ---------------------- | ----------------- | ---------------------- |
+| VLAN 30 — WEB_SERVERS  | `192.198.100.1`   | Gateway del ServerWeb  |
+| VLAN 40 — DHCP_SERVERS | `192.198.100.129` | Gateway del ServerDHCP |
+
+> **Importante:** HSRP se configura en las **subinterfaces** `Gi0/1.30` y `Gi0/1.40` de cada router, ya que es por `Gi0/1` donde están conectados los servidores a través de Switch3.
+
+---
+
+### 12.1 Configuración HSRP en Router2 (Activo)
+
+```bash
+enable
+configure terminal
+
+# HSRP en VLAN 30 — Router2 es ACTIVO (prioridad 110)
+interface GigabitEthernet0/1.30
+standby 30 ip 192.198.100.1
+standby 30 priority 110
+standby 30 preempt
+exit
+
+# HSRP en VLAN 40 — Router2 es ACTIVO (prioridad 110)
+interface GigabitEthernet0/1.40
+standby 40 ip 192.198.100.129
+standby 40 priority 110
+standby 40 preempt
+exit
+
+end
+write memory
+```
+
+---
+
+### 12.2 Configuración HSRP en Router3 (Standby)
+
+```bash
+enable
+configure terminal
+
+# HSRP en VLAN 30 — Router3 es STANDBY (prioridad default 100)
+interface GigabitEthernet0/1.30
+standby 30 ip 192.198.100.1
+exit
+
+# HSRP en VLAN 40 — Router3 es STANDBY (prioridad default 100)
+interface GigabitEthernet0/1.40
+standby 40 ip 192.198.100.129
+exit
+
+end
+write memory
+```
+
+---
+
+### 12.3 Restaurar gateways de los servidores
+
+Una vez configurado HSRP, los servidores deben usar la **IP virtual** como gateway, no la IP real de Router2. Esto garantiza que si Router2 falla, los servidores sigan funcionando a través de Router3.
+
+**En ServerWeb → Desktop → IP Configuration:**
+
+| Parámetro       | Valor             |
+| --------------- | ----------------- |
+| IP Address      | `192.198.100.2`   |
+| Subnet Mask     | `255.255.255.128` |
+| Default Gateway | `192.198.100.1`   |
+| DNS Server      | `127.0.0.1`       |
+
+**En ServerDHCP → Desktop → IP Configuration:**
+
+| Parámetro       | Valor             |
+| --------------- | ----------------- |
+| IP Address      | `192.198.100.130` |
+| Subnet Mask     | `255.255.255.128` |
+| Default Gateway | `192.198.100.129` |
+| DNS Server      | `192.198.100.2`   |
+
+---
+
+### 12.4 Verificación de HSRP
+
+```bash
+# Ver estado HSRP en Router2 — debe mostrar Active en ambas VLANs
+show standby brief
+
+# Ver detalle completo de HSRP
+show standby
+
+# Verificar en Router3 — debe mostrar Standby en ambas VLANs
+show standby brief
+```
+
+**Resultado esperado en Router2:**
+
+```
+Interface   Grp  Pri P State    Active          Standby         Virtual IP
+Gi0/1.30    30   110 P Active   local           192.198.100.4   192.198.100.1
+Gi0/1.40    40   110 P Active   local           192.198.100.132 192.198.100.129
+```
+
+**Resultado esperado en Router3:**
+
+```
+Interface   Grp  Pri P State    Active          Standby         Virtual IP
+Gi0/1.30    30   100   Standby  192.198.100.3   local           192.198.100.1
+Gi0/1.40    40   100   Standby  192.198.100.131 local           192.198.100.129
+```
+
+---
+
+### 12.5 Prueba de failover HSRP
+
+Para verificar que HSRP funciona correctamente ante un fallo:
+
+1. Con Router2 activo, hacer ping desde Router1 hacia `192.198.100.2` — debe responder ✅
+2. Apagar Router2 en Packet Tracer (clic derecho → Power Off)
+3. Esperar 10 segundos para que Router3 tome el rol activo
+4. Hacer ping nuevamente desde Router1 hacia `192.198.100.2` — debe seguir respondiendo ✅
+5. Encender Router2 nuevamente — debe retomar el rol activo gracias a `preempt` ✅
+
+```bash
+# Desde Router1 — prueba antes del fallo
+ping 192.198.100.2
+
+# Desde Router1 — prueba después de apagar Router2
+ping 192.198.100.2
+
+# Ver que Router3 tomó el rol activo
+show standby brief
+```
