@@ -1063,3 +1063,217 @@ También se puede acceder directamente por IP para verificar que HTTP funciona i
 **PC Provisional, conectada al Switch3**
 
 ![Provisional DNS](img/DNS/Provicional_DNS.png)
+
+## 11. Configuración LACP
+
+**LACP (Link Aggregation Control Protocol)** es un protocolo estándar definido en el estándar IEEE 802.3ad que permite combinar múltiples interfaces físicas en un único enlace lógico denominado **EtherChannel** o **Port-Channel**. Esto proporciona dos beneficios principales:
+
+- **Mayor ancho de banda**: al agrupar 4 interfaces FastEthernet de 100 Mbps, se obtiene un enlace lógico de hasta 400 Mbps entre edificios.
+- **Tolerancia a fallos**: si una de las interfaces físicas falla, el tráfico se redistribuye automáticamente entre las interfaces restantes sin interrumpir la comunicación.
+
+En esta práctica se configuran tres enlaces LACP, uno por cada conexión entre edificios.
+
+Los puertos utilizados para este enlace son:
+
+| Port-Channel | Enlace               | Puertos Multilayer Switch4 | Puertos Dispositivo Remoto            |
+| ------------ | -------------------- | -------------------------- | ------------------------------------- |
+| Po1          | Data Center ↔ Piso 1 | `Fa0/21 - Fa0/24`          | Multilayer Switch2: `Fa0/21 - Fa0/24` |
+| Po2          | Piso 2 ↔ Piso 1      | `Fa0/17 - Fa0/20`          | Multilayer Switch0: `Fa0/21 - Fa0/24` |
+| Po3          | Piso 3 ↔ Piso 1      | `Fa0/13 - Fa0/16`          | Multilayer Switch3: `Fa0/21 - Fa0/24` |
+
+> **Nota importante:** En LACP, un extremo se configura como **active** y el otro como **passive**. El extremo **active** inicia la negociación, mientras que el extremo **passive** responde. En esta práctica, el Multilayer Switch2 (Data Center) será el extremo **active** y el Multilayer Switch4 (Piso 1) será el extremo **passive**.
+
+---
+
+### 11.1 Configuración LACP en Multilayer Switch4 (Piso 1 — Active en todos los enlaces)
+
+```bash
+enable
+configure terminal
+
+# -----------------------------------------------
+# Port-Channel 1 — Enlace hacia Data Center
+# Puertos: Fa0/21 - Fa0/24
+# -----------------------------------------------
+interface range FastEthernet0/21 - 24
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allowed vlan 10,20,30,40
+channel-group 1 mode active
+no shutdown
+exit
+
+# Configurar interfaz lógica Port-Channel1
+interface Port-channel1
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allowed vlan 10,20,30,40
+no shutdown
+exit
+
+# -----------------------------------------------
+# Port-Channel 2 — Enlace hacia Piso 2
+# Puertos: Fa0/17 - Fa0/20
+# -----------------------------------------------
+interface range FastEthernet0/17 - 20
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allowed vlan 10,20,30,40
+channel-group 2 mode active
+no shutdown
+exit
+
+# Configurar interfaz lógica Port-Channel2
+interface Port-channel2
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allowed vlan 10,20,30,40
+no shutdown
+exit
+
+# -----------------------------------------------
+# Port-Channel 3 — Enlace hacia Piso 3
+# Puertos: Fa0/13 - Fa0/16
+# -----------------------------------------------
+interface range FastEthernet0/13 - 16
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allowed vlan 10,20,30,40
+channel-group 3 mode active
+no shutdown
+exit
+
+# Configurar interfaz lógica Port-Channel3
+interface Port-channel3
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allowed vlan 10,20,30,40
+no shutdown
+exit
+
+end
+write memory
+```
+
+---
+
+### 11.2 Configuración LACP en Multilayer Switch2 (Data Center — Passive)
+
+```bash
+enable
+configure terminal
+
+# Port-Channel 1 — Enlace hacia Piso 1
+# Puertos: Fa0/21 - Fa0/24
+interface range FastEthernet0/21 - 24
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allowed vlan 10,20,30,40
+channel-group 1 mode passive
+no shutdown
+exit
+
+# Configurar interfaz lógica Port-Channel1
+interface Port-channel1
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allowed vlan 10,20,30,40
+no shutdown
+exit
+
+end
+write memory
+```
+
+> **Nota:** La configuración del lado de Multilayer Switch0 (Piso 2) con Port-Channel 2 y Multilayer Switch3 (Piso 3) con Port-Channel 3 en modo **passive** es responsabilidad de las **Personas 2 y 3** respectivamente.
+
+---
+
+### 11.3 Configuración LACP en Multilayer Switch0 (Piso 2 — Passive)
+
+```bash
+enable
+configure terminal
+
+# Port-Channel 2 — Enlace hacia Piso 1
+interface range FastEthernet0/21 - 24
+no shutdown
+channel-group 2 mode passive
+exit
+
+interface Port-channel2
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allowed vlan 10,20,30,40
+no shutdown
+exit
+
+end
+write memory
+```
+
+---
+
+### 11.4 Configuración LACP en Multilayer Switch3 (Piso 3 — Passive)
+
+```bash
+enable
+configure terminal
+
+# Port-Channel 3 — Enlace hacia Piso 1
+interface range FastEthernet0/21 - 24
+no shutdown
+channel-group 3 mode passive
+exit
+
+interface Port-channel3
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allowed vlan 10,20,30,40
+no shutdown
+exit
+
+end
+write memory
+```
+
+### 11.5 Verificación de LACP
+
+Una vez configurado en ambos extremos de cada enlace, se puede verificar el estado con los siguientes comandos en cualquiera de los switches involucrados:
+
+```bash
+# Ver resumen de todos los EtherChannels configurados
+# Debe mostrar Po1, Po2 y Po3 en estado SU (layer2, in use)
+show etherchannel summary
+
+# Ver detalle de un Port-Channel específico
+show etherchannel 1 detail
+show etherchannel 2 detail
+show etherchannel 3 detail
+
+# Ver estado de la interfaz lógica
+show interfaces Port-channel1
+show interfaces Port-channel2
+show interfaces Port-channel3
+
+# Ver que los trunks están activos en los Port-Channels
+show interfaces trunk
+
+# Ver que todas las VLANs están permitidas
+show vlan brief
+```
+
+- **MS2**
+
+![MS2 Lacp](img/LACP/MS2_LACP.png)
+
+- **MS4**
+
+![MS4 LACP](img/LACP/MS4_LACP.png)
+
+Los indicadores significan:
+
+- `SU` — EtherChannel activo y funcionando en capa 2
+- `P` — Puerto activo y formando parte del canal
+- `D` — Puerto caído, no forma parte del canal activo
+- `I` — Puerto independiente, no negoció correctamente con el extremo remoto
