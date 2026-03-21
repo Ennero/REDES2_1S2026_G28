@@ -568,3 +568,293 @@ show ip interface brief
 - **Multilayer Switch 2**
 
 ![MS2 vlan](img/Vlans/MS2_vlan.png)
+
+## 7. Configuración DHCP
+
+El protocolo DHCP (Dynamic Host Configuration Protocol) es un servicio de red que asigna automáticamente direcciones IP y parámetros de configuración (máscara de subred, gateway predeterminado y servidor DNS) a los dispositivos finales de la red. Esto elimina la necesidad de configurar manualmente cada host, facilitando la administración y escalabilidad de la red.
+
+En esta práctica, el **ServerDHCP** ubicado en el Data Center es el servidor centralizado encargado de entregar direccionamiento dinámico a todos los dispositivos de la red cableada del Piso 1 (VLAN 10 y VLAN 20). Dado que las solicitudes DHCP son mensajes broadcast y estos no atraviesan routers por defecto, se configura el comando `ip helper-address` en las subinterfaces de Router0 y Router1 para reenviar dichas solicitudes como unicast hacia el ServerDHCP.
+
+Los Wireless Routers de los pisos 2 y 3 actúan como servidores DHCP locales para sus propias redes inalámbricas, por lo que se configuran de forma independiente y se documentan en la **Sección 8 — Configuración Inalámbrica**.
+
+---
+
+### 7.1 Configuración de IP estática en ServerWeb
+
+El ServerWeb requiere una dirección IP estática ya que es el servidor DNS y HTTP de toda la red. Los dispositivos clientes apuntarán a esta IP para resolver nombres de dominio, por lo que no puede cambiar dinámicamente.
+
+**Pasos en Packet Tracer (interfaz gráfica):**
+
+1. Hacer clic en **ServerWeb** → pestaña **Desktop** → **IP Configuration**
+2. Seleccionar **Static** e ingresar los siguientes valores:
+
+| Parámetro       | Valor             |
+| --------------- | ----------------- |
+| IP Address      | `192.198.100.2`   |
+| Subnet Mask     | `255.255.255.128` |
+| Default Gateway | `192.198.100.1`   |
+| DNS Server      | `127.0.0.1`       |
+
+> **Nota:** El DNS Server apunta a `127.0.0.1` (loopback) porque el propio ServerWeb es el servidor DNS. Esto es necesario para que Packet Tracer active correctamente el servicio DNS en el servidor.
+
+---
+
+### 7.2 Configuración de IP estática en ServerDHCP
+
+El ServerDHCP también requiere una dirección IP estática para que los routers puedan reenviarle las solicitudes DHCP mediante `ip helper-address` de forma consistente.
+
+**Pasos en Packet Tracer (interfaz gráfica):**
+
+1. Hacer clic en **ServerDHCP** → pestaña **Desktop** → **IP Configuration**
+2. Seleccionar **Static** e ingresar los siguientes valores:
+
+| Parámetro       | Valor             |
+| --------------- | ----------------- |
+| IP Address      | `192.198.100.130` |
+| Subnet Mask     | `255.255.255.128` |
+| Default Gateway | `192.198.100.129` |
+| DNS Server      | `192.198.100.2`   |
+
+> **Nota:** El DNS Server apunta a `192.198.100.2` que es la IP del ServerWeb, ya que este es quien provee el servicio DNS para toda la red.
+
+---
+
+### 7.3 Configuración de Pools DHCP en ServerDHCP
+
+El ServerDHCP debe tener un pool configurado por cada VLAN que requiere direccionamiento dinámico. En Packet Tracer, esto se realiza desde la interfaz gráfica del servidor.
+
+**Pasos en Packet Tracer (interfaz gráfica):**
+
+1. Hacer clic en **ServerDHCP** → pestaña **Services** → **DHCP**
+2. Activar el servicio con el botón **On**
+3. Crear cada pool con los siguientes valores:
+
+**Pool 1 — VLAN 10 (ADMIN)**
+
+| Parámetro        | Valor             |
+| ---------------- | ----------------- |
+| Pool Name        | `POOL_ADMIN`      |
+| Default Gateway  | `192.198.10.1`    |
+| DNS Server       | `192.198.100.2`   |
+| Start IP Address | `192.198.10.1`    |
+| Subnet Mask      | `255.255.255.240` |
+| Max Users        | `14`              |
+
+**Pool 2 — VLAN 20 (ESTUDIANTES)**
+
+| Parámetro        | Valor              |
+| ---------------- | ------------------ |
+| Pool Name        | `POOL_ESTUDIANTES` |
+| Default Gateway  | `192.198.10.65`    |
+| DNS Server       | `192.198.100.2`    |
+| Start IP Address | `192.198.10.65`    |
+| Subnet Mask      | `255.255.255.192`  |
+| Max Users        | `62`               |
+
+**Pool 3 — VLAN 30 (WEB_SERVERS)**
+
+| Parámetro        | Valor              |
+| ---------------- | ------------------ |
+| Pool Name        | `POOL_WEB_SERVERS` |
+| Default Gateway  | `192.198.100.1`    |
+| DNS Server       | `192.198.100.2`    |
+| Start IP Address | `192.198.100.2`    |
+| Subnet Mask      | `255.255.255.128`  |
+| Max Users        | `126`              |
+
+**Pool 4 — VLAN 40 (DHCP_SERVERS)**
+
+| Parámetro        | Valor               |
+| ---------------- | ------------------- |
+| Pool Name        | `POOL_DHCP_SERVERS` |
+| Default Gateway  | `192.198.100.129`   |
+| DNS Server       | `192.198.100.2`     |
+| Start IP Address | `192.198.100.130`   |
+| Subnet Mask      | `255.255.255.128`   |
+| Max Users        | `126`               |
+
+> **Nota:** Los pools de VLAN 30 y 40 se crean como respaldo, pero los servidores (ServerWeb y ServerDHCP) tienen IP estática, por lo que no solicitarán IP dinámica. El pool existe para cualquier dispositivo adicional que se agregue a esas VLANs en el futuro.
+
+---
+
+### 7.4 Configuración de subinterfaces en Router2 (Data Center — HSRP Activo)
+
+Router2 necesita subinterfaces para cada VLAN del Data Center, permitiendo el enrutamiento entre VLANs y la comunicación con los servidores.
+
+```bash
+enable
+configure terminal
+
+# Activar interfaz física hacia Switch3
+interface GigabitEthernet0/0
+no shutdown
+exit
+
+# Subinterfaz para VLAN 30 - WEB_SERVERS
+interface GigabitEthernet0/0.30
+encapsulation dot1Q 30
+ip address 192.198.100.3 255.255.255.128
+no shutdown
+exit
+
+# Subinterfaz para VLAN 40 - DHCP_SERVERS
+interface GigabitEthernet0/0.40
+encapsulation dot1Q 40
+ip address 192.198.100.131 255.255.255.128
+no shutdown
+exit
+
+# Activar interfaz física hacia Multilayer Switch2
+interface GigabitEthernet0/1
+ip address 10.2.0.1 255.255.255.252
+no shutdown
+exit
+
+end
+write memory
+```
+
+---
+
+### 7.5 Configuración de subinterfaces en Router3 (Data Center — HSRP Standby)
+
+Router3 es el router de respaldo en HSRP para el Data Center. Necesita subinterfaces con IPs distintas a Router2 pero en la misma subred, para poder participar en HSRP.
+
+```bash
+enable
+configure terminal
+
+# Activar interfaz física hacia Switch3
+interface GigabitEthernet0/0
+no shutdown
+exit
+
+# Subinterfaz para VLAN 30 - WEB_SERVERS
+interface GigabitEthernet0/0.30
+encapsulation dot1Q 30
+ip address 192.198.100.4 255.255.255.128
+no shutdown
+exit
+
+# Subinterfaz para VLAN 40 - DHCP_SERVERS
+interface GigabitEthernet0/0.40
+encapsulation dot1Q 40
+ip address 192.198.100.132 255.255.255.128
+no shutdown
+exit
+
+# Activar interfaz física hacia Multilayer Switch2
+interface GigabitEthernet0/1
+ip address 10.2.0.5 255.255.255.252
+no shutdown
+exit
+
+end
+write memory
+```
+
+---
+
+### 7.6 Configuración de subinterfaces en Router1 (Piso 1 — HSRP Activo)
+
+Router1 es el router activo del Piso 1. Además de las subinterfaces para cada VLAN, se configura `ip helper-address` apuntando al ServerDHCP para que los clientes del Piso 1 puedan obtener IPs dinámicamente desde el servidor centralizado.
+
+```bash
+enable
+configure terminal
+
+# Activar interfaz física hacia Switch0
+interface GigabitEthernet0/0
+no shutdown
+exit
+
+# Subinterfaz para VLAN 10 - ADMIN
+interface GigabitEthernet0/0.10
+encapsulation dot1Q 10
+ip address 192.198.10.1 255.255.255.240
+ip helper-address 192.198.100.130
+no shutdown
+exit
+
+# Subinterfaz para VLAN 20 - ESTUDIANTES
+interface GigabitEthernet0/0.20
+encapsulation dot1Q 20
+ip address 192.198.10.65 255.255.255.192
+ip helper-address 192.198.100.130
+no shutdown
+exit
+
+# Activar interfaz física hacia Multilayer Switch4
+interface GigabitEthernet0/1
+ip address 10.2.0.13 255.255.255.252
+no shutdown
+exit
+
+end
+write memory
+```
+
+---
+
+### 7.7 Configuración de subinterfaces en Router0 (Piso 1 — HSRP Standby)
+
+Router0 es el router standby del Piso 1. También necesita `ip helper-address` para que cuando tome el rol activo en HSRP, pueda continuar reenviando solicitudes DHCP correctamente.
+
+```bash
+enable
+configure terminal
+
+# Activar interfaz física hacia Switch0
+interface GigabitEthernet0/0
+no shutdown
+exit
+
+# Subinterfaz para VLAN 10 - ADMIN
+interface GigabitEthernet0/0.10
+encapsulation dot1Q 10
+ip address 192.198.10.2 255.255.255.240
+ip helper-address 192.198.100.130
+no shutdown
+exit
+
+# Subinterfaz para VLAN 20 - ESTUDIANTES
+interface GigabitEthernet0/0.20
+encapsulation dot1Q 20
+ip address 192.198.10.66 255.255.255.192
+ip helper-address 192.198.100.130
+no shutdown
+exit
+
+# Activar interfaz física hacia Multilayer Switch4
+interface GigabitEthernet0/1
+ip address 10.2.0.9 255.255.255.252
+no shutdown
+exit
+
+end
+write memory
+```
+
+---
+
+### 7.8 Verificación de DHCP
+
+Una vez configurados todos los dispositivos, se puede verificar el correcto funcionamiento del servicio DHCP con los siguientes comandos:
+
+```bash
+# En Router1 o Router0 — verificar que el helper-address está activo
+show ip interface GigabitEthernet0/0.10
+show ip interface GigabitEthernet0/0.20
+
+# En Router1 o Router0 — verificar subinterfaces configuradas
+show ip interface brief
+
+# En un PC cliente del Piso 1 — solicitar IP dinámica
+# (desde el Command Prompt del PC en Packet Tracer)
+ipconfig /renew
+
+# Ver la IP asignada
+ipconfig
+```
+
+## 8-configuración-inalámbrica
