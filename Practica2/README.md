@@ -849,12 +849,217 @@ show ip interface GigabitEthernet0/0.20
 # En Router1 o Router0 — verificar subinterfaces configuradas
 show ip interface brief
 
-# En un PC cliente del Piso 1 — solicitar IP dinámica
-# (desde el Command Prompt del PC en Packet Tracer)
-ipconfig /renew
-
-# Ver la IP asignada
-ipconfig
 ```
 
-## 8-configuración-inalámbrica
+- **Router0**
+
+![Router0 DHCP](img/DHCP/Router0_DHCP.png)
+
+- **Router1**
+
+![Router1 DHCP](img/DHCP/Router1_DHCP.png)
+
+## 8. Configuración-inalámbrica
+
+## 9. Configuración DNS y Servidor Web
+
+El **DNS (Domain Name System)** es un servicio de red que traduce nombres de dominio legibles por humanos (como `www.practica2_Grupo0.com`) en direcciones IP que los dispositivos de red pueden utilizar para establecer comunicaciones. Sin DNS, los usuarios tendrían que recordar la dirección IP numérica de cada servicio al que deseen acceder.
+
+El **servidor HTTP (HyperText Transfer Protocol)** es el servicio encargado de alojar y servir páginas web estáticas o dinámicas a los clientes que las soliciten a través de un navegador web. En esta práctica, el ServerWeb cumple ambos roles simultáneamente: es el servidor DNS de toda la red y el servidor HTTP que aloja la página web del grupo.
+
+El dominio configurado para esta práctica es: **`www.practica2_Grupo0.com`**
+
+Cuando cualquier dispositivo de la red ingrese este dominio en su navegador, el ServerWeb primero resolverá el nombre a la IP `192.198.100.2` mediante DNS, y luego servirá la página web estática mediante HTTP.
+
+> **Nota:** Toda la configuración del ServerWeb se realiza desde la **interfaz gráfica** de Packet Tracer, ya que el dispositivo Server-PT no dispone de CLI para configurar servicios como DNS y HTTP.
+
+---
+
+### 9.1 Configuración del Servicio DNS en ServerWeb
+
+El servicio DNS necesita tener al menos dos tipos de registros configurados:
+
+- **Registro A**: asocia el nombre de dominio con una dirección IP.
+- **Registro NS**: indica cuál es el servidor autoritativo para el dominio.
+
+**Pasos en Packet Tracer (interfaz gráfica):**
+
+1. Hacer clic en **ServerWeb** → pestaña **Services** → **DNS**
+2. Activar el servicio con el botón **On**
+3. Agregar los siguientes registros uno por uno usando el botón **Add**:
+
+**Registro 1 — Tipo A (resolución del dominio principal)**
+
+| Campo   | Valor                      |
+| ------- | -------------------------- |
+| Name    | `www.practica2_Grupo0.com` |
+| Type    | `A Record`                 |
+| Address | `192.198.100.2`            |
+
+**Registro 2 — Tipo A (resolución sin prefijo www)**
+
+| Campo   | Valor                  |
+| ------- | ---------------------- |
+| Name    | `practica2_Grupo0.com` |
+| Type    | `A Record`             |
+| Address | `192.198.100.2`        |
+
+**Registro 3 — Tipo NS (servidor de nombres autoritativo)**
+
+| Campo       | Valor                      |
+| ----------- | -------------------------- |
+| Name        | `practica2_Grupo0.com`     |
+| Type        | `NS`                       |
+| Server Name | `www.practica2_Grupo0.com` |
+
+---
+
+### 9.2 Configuración del Servicio HTTP en ServerWeb
+
+El servicio HTTP aloja la página web estática que se desplegará al ingresar el dominio en el navegador. La página debe mostrar los datos de los integrantes del grupo.
+
+**Pasos en Packet Tracer (interfaz gráfica):**
+
+1. Hacer clic en **ServerWeb** → pestaña **Services** → **HTTP**
+2. Verificar que el servicio **HTTP** esté **On**
+3. Verificar que el servicio **HTTPS** esté **On**
+4. Hacer clic en el archivo **index.html** y luego en **Edit**
+5. Reemplazar el contenido existente con el siguiente código HTML:
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Practica 2 - Grupo 0</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f4f8;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      .container {
+        background-color: white;
+        border-radius: 10px;
+        padding: 40px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        width: 100%;
+      }
+      h1 {
+        color: #1a3c6e;
+        text-align: center;
+        border-bottom: 2px solid #1a3c6e;
+        padding-bottom: 10px;
+      }
+      h2 {
+        color: #2e5fa3;
+        margin-top: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      th {
+        background-color: #1a3c6e;
+        color: white;
+        padding: 10px;
+        text-align: left;
+      }
+      td {
+        padding: 8px 10px;
+        border-bottom: 1px solid #ddd;
+      }
+      tr:hover {
+        background-color: #f5f5f5;
+      }
+      .grupo {
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        color: #1a3c6e;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Redes de Computadoras 2</h1>
+      <h2>Practica 2: Conectividad Biblioteca FIUSAC</h2>
+      <h2>Integrantes del Grupo</h2>
+      <table>
+        <tr>
+          <th>No.</th>
+          <th>Nombre</th>
+          <th>Carne</th>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>David Estuardo Barrios Ramirez</td>
+          <td>202300670</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Marcos Daniel Bonifasi de Leon</td>
+          <td>202202410</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Enner Esai Mendizabal Castro</td>
+          <td>202302220</td>
+        </tr>
+      </table>
+      <p class="grupo">Grupo No. 28</p>
+      <p class="grupo">Universidad San Carlos de Guatemala</p>
+      <p class="grupo">Facultad de Ingenieria - FIUSAC</p>
+    </div>
+  </body>
+</html>
+```
+
+6. Hacer clic en **Save** para guardar los cambios.
+
+---
+
+### 9.3 Verificación del Servicio DNS
+
+Para verificar que el DNS está resolviendo correctamente el dominio, se puede usar el comando `nslookup` desde cualquier PC de la red que ya tenga conectividad con el ServerWeb.
+
+> **Nota:** Esta verificación se podrá realizar completamente una vez que OSPF y LACP estén configurados y la red tenga conectividad total de extremo a extremo.
+
+```bash
+# Desde el Command Prompt de cualquier PC cliente en Packet Tracer
+
+# Verificar resolución DNS del dominio
+nslookup www.practica2_Grupo0.com
+
+# Resultado esperado:
+# Server:  [192.198.100.2]
+# Address: 192.198.100.2
+# Name:    www.practica2_Grupo0.com
+# Address: 192.198.100.2
+```
+
+---
+
+### 9.4 Verificación del Servicio HTTP
+
+Para verificar que la página web se despliega correctamente:
+
+1. En cualquier PC cliente de la red en Packet Tracer → pestaña **Desktop** → **Web Browser**
+2. En la barra de direcciones ingresar: `www.practica2_Grupo0.com`
+3. La página debe cargar mostrando los datos del grupo
+
+También se puede acceder directamente por IP para verificar que HTTP funciona independientemente del DNS:
+
+1. En el Web Browser ingresar directamente: `192.198.100.2`
+2. Debe desplegarse la misma página web estática
+
+**PC Provisional, conectada al Switch3**
+
+![Provisional DNS](img/DNS/Provicional_DNS.png)
