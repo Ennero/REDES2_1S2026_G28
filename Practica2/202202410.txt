@@ -1,0 +1,340 @@
+<Switch0>:
+Switch0>
+Switch0>enable
+Switch0#conf ter
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch0(config)#no ip domain-loopup
+                                ^
+% Invalid input detected at '^' marker.
+	
+Switch0(config)#exit
+Switch0#
+%SYS-5-CONFIG_I: Configured from console by console
+
+Switch0#
+Switch0#no ip domain-lookup
+           ^
+% Invalid input detected at '^' marker.
+	
+Switch0#conf ter
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch0(config)#no ip domain-lookup
+Switch0(config)#end
+Switch0#
+%SYS-5-CONFIG_I: Configured from console by console
+
+Switch0#show vlan brief
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Fa0/1, Fa0/2, Fa0/3, Fa0/4
+                                                Fa0/5, Fa0/6, Fa0/7, Fa0/8
+                                                Fa0/9, Fa0/10, Fa0/11, Fa0/12
+                                                Fa0/13, Fa0/14, Fa0/15, Fa0/16
+                                                Fa0/17, Fa0/18, Fa0/19, Fa0/20
+                                                Fa0/21, Fa0/22, Gig0/1
+10   ADMIN                            active    Fa0/24
+20   ESTUDIANTES                      active    Fa0/23
+1002 fddi-default                     active    
+1003 token-ring-default               active    
+1004 fddinet-default                  active    
+1005 trnet-default                    active    
+Switch0#
+Switch0#
+Switch0#conf ter
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch0(config)#interface gi0/1
+Switch0(config-if)# switchport mode trunk
+
+Switch0(config-if)# switchport trunk allowed vlan 10,20
+Switch0(config-if)# no shutdown
+Switch0(config-if)#exit
+Switch0(config)#
+%LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/1, changed state to down
+
+%LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/1, changed state to up
+
+Switch0(config)#interface gi0/2
+Switch0(config-if)# switchport mode trunk
+Switch0(config-if)# switchport trunk allowed vlan 10,20
+Switch0(config-if)# no shutdown
+Switch0(config-if)#exit
+Switch0(config)#
+Switch0(config)#
+Switch0(config)#
+Switch0(config)#interface fa0/3
+Switch0(config-if)#interface fa0/3
+Switch0#
+%SYS-5-CONFIG_I: Configured from console by console
+
+Switch0#conf ter
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch0(config)#interface fa0/23
+Switch0(config-if)# switchport mode access
+Switch0(config-if)# switchport access vlan 10
+Switch0(config-if)# spanning-tree portfast
+%Warning: portfast should only be enabled on ports connected to a single
+host. Connecting hubs, concentrators, switches, bridges, etc... to this
+interface  when portfast is enabled, can cause temporary bridging loops.
+Use with CAUTION
+
+%Portfast has been configured on FastEthernet0/23 but will only
+have effect when the interface is in a non-trunking mode.
+Switch0(config-if)# no shutdown
+Switch0(config-if)#exit
+Switch0(config)#interface fa0/24
+Switch0(config-if)# switchport mode access
+Switch0(config-if)# switchport access vlan 20
+Switch0(config-if)# spanning-tree portfast
+%Warning: portfast should only be enabled on ports connected to a single
+host. Connecting hubs, concentrators, switches, bridges, etc... to this
+interface  when portfast is enabled, can cause temporary bridging loops.
+Use with CAUTION
+
+%Portfast has been configured on FastEthernet0/24 but will only
+have effect when the interface is in a non-trunking mode.
+Switch0(config-if)# no shutdown
+Switch0(config-if)#exit
+Switch0(config)#
+Switch0(config)#end
+Switch0#
+%SYS-5-CONFIG_I: Configured from console by console
+
+Switch0#write mem
+Building configuration...
+[OK]
+Switch0#show vlan brief
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Fa0/1, Fa0/2, Fa0/3, Fa0/4
+                                                Fa0/5, Fa0/6, Fa0/7, Fa0/8
+                                                Fa0/9, Fa0/10, Fa0/11, Fa0/12
+                                                Fa0/13, Fa0/14, Fa0/15, Fa0/16
+                                                Fa0/17, Fa0/18, Fa0/19, Fa0/20
+                                                Fa0/21, Fa0/22
+10   ADMIN                            active    Fa0/23
+20   ESTUDIANTES                      active    Fa0/24
+1002 fddi-default                     active    
+1003 token-ring-default               active    
+1004 fddinet-default                  active    
+1005 trnet-default                    active    
+Switch0#show interfaces trunk
+Port        Mode         Encapsulation  Status        Native vlan
+Gig0/1      on           802.1q         trunking      1
+Gig0/2      on           802.1q         trunking      1
+
+Port        Vlans allowed on trunk
+Gig0/1      10,20
+Gig0/2      10,20
+
+Port        Vlans allowed and active in management domain
+Gig0/1      10,20
+Gig0/2      10,20
+
+Port        Vlans in spanning tree forwarding state and not pruned
+Gig0/1      10,20
+Gig0/2      10,20
+
+
+
+<ROUTER1>:
+
+
+Router1>
+Router1>enable
+Router1#conf ter
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router1(config)#no ip domain-lookup
+Router1(config)#interface gi0/1
+Router1(config-if)#no shutdown
+Router1(config-if)#exit
+Router1(config)#interface gi0/0.
+                                ^
+% Invalid input detected at '^' marker.
+	
+Router1(config)#interface g0/1.10
+Router1(config-subif)# encapsulation dot1Q 10
+Router1(config-subif)# ip address 192.198.11.66 255.255.255.240
+Router1(config-subif)# standby 10 ip 192.198.11.65
+Router1(config-subif)# standby 10 priority 110
+Router1(config-subif)# standby 10 preempt
+Router1(config-subif)#exit
+Router1(config)#interface g
+%HSRP-6-STATECHANGE: GigabitEthernet0/1.10 Grp 10 state Speak -> Standby
+
+%HSRP-6-STATECHANGE: GigabitEthernet0/1.10 Grp 10 state Standby -> Active
+
+% Incomplete command.
+Router1(config)#interface gi0/1.20
+Router1(config-subif)# encapsulation dot1Q 20
+Router1(config-subif)# ip address 192.198.11.3 255.255.255.192
+Router1(config-subif)# standby 20 ip 192.198.11.1
+Router1(config-subif)# standby 20 priority 90
+Router1(config-subif)# standby 20 preempt
+Router1(config-subif)#exit
+Router1(config)#interface g0/0
+Router1(config-if)#
+%HSRP-6-STATECHANGE: GigabitEthernet0/1.20 Grp 20 state Speak -> Standby
+
+%HSRP-6-STATECHANGE: GigabitEthernet0/1.20 Grp 20 state Standby -> Active
+
+Router1(config-if)#interface g0/0
+Router1(config-if)# ip address 10.2.1.2 255.255.255.252
+Router1(config-if)# no shutdown
+Router1(config-if)#exit
+00:13:57: %OSPF-5-ADJCHG: Process 1, Nbr 44.44.44.44 on GigabitEthernet0/0 from FULL to DOWN, Neighbor Down: Interface down or detached
+
+Router1(config)#
+Router1(config)#router ospf 1
+Router1(config-router)# router-id 1.1.1.1
+Router1(config-router)# network 10.2.1.0 0.0.0.3 area 0
+Router1(config-router)# network 192.198.11.64 0.0.0.15 area 0
+Router1(config-router)# network 192.198.11.0 0.0.0.63 area 0
+Router1(config-router)#passive-interface g0/1.10
+Router1(config-router)#passive-interface g0/1.20
+Router1(config-router)#exit
+Router1(config)#
+Router1(config)#
+Router1(config)#
+Router1(config)#end
+Router1#write memory
+Building configuration...
+[OK]
+Router1#show standby brief
+                     P indicates configured to preempt.
+                     |
+Interface   Grp  Pri P State    Active          Standby         Virtual IP
+Gig         10   110 P Active   local           unknown         192.198.11.65  
+Gig         20   90  P Active   local           unknown         192.198.11.1   
+Router1#show ip ospf neighbor
+
+Router1#show ip route
+%SYS-5-CONFIG_I: Configured from console by console
+
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2, E - EGP
+       i - IS-IS, L1 - IS-IS level-1, L2 - IS-IS level-2, ia - IS-IS inter area
+       * - candidate default, U - per-user static route, o - ODR
+       P - periodic downloaded static route
+
+Gateway of last resort is not set
+
+     10.0.0.0/8 is variably subnetted, 2 subnets, 2 masks
+C       10.2.1.0/30 is directly connected, GigabitEthernet0/0
+L       10.2.1.2/32 is directly connected, GigabitEthernet0/0
+     192.198.11.0/24 is variably subnetted, 4 subnets, 3 masks
+C       192.198.11.0/26 is directly connected, GigabitEthernet0/1.20
+L       192.198.11.3/32 is directly connected, GigabitEthernet0/1.20
+C       192.198.11.64/28 is directly connected, GigabitEthernet0/1.10
+L       192.198.11.66/32 is directly connected, GigabitEthernet0/1.10
+
+<Router0>:
+Router0>
+Router0>enable
+Router0#conf ter
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router0(config)#no ip domain-lookup
+Router0(config)#
+Router0(config)#
+Router0(config)#inter g0/1
+Router0(config-if)#no shutdown
+Router0(config-if)#exit
+Router0(config)#interface g0/1.10
+Router0(config-subif)# encapsulation dot1Q 10
+Router0(config-subif)# ip address 192.198.11.67 255.255.255.240
+Router0(config-subif)# standby 10 ip 192.198.11.65
+Router0(config-subif)# standby 10 priority 90
+Router0(config-subif)# standby 10 preempt
+Router0(config-subif)#exit
+Router0(config)#interface g0/1.20
+Router0(config-subif)# encapsulation dot1Q 20
+Router0(config-subif)# ip address 192.198.11.2 255.255.255.192
+Router0(config-subif)# standby 20 ip 192.198.11.1
+Router0(config-subif)# standby 20 priority 110
+Router0(config-subif)# standby 20 preempt
+Router0(config-subif)#exit
+Router0(config)#
+ %HSRP-6-STATECHANGE: GigabitEthernet0/1.20 Grp 20 state Standby -> Active
+
+Router0(config)#interface g0/
+%HSRP-6-STATECHANGE: GigabitEthernet0/1.10 Grp 10 state Speak -> Standby
+0
+Router0#
+%SYS-5-CONFIG_I: Configured from console by console
+
+Router0#conf ter
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router0(config)# standby 10 priority 90
+Router0#
+%SYS-5-CONFIG_I: Configured from console by console
+
+Router0#conf ter
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router0(config)# standby 10 priority 90
+                  ^
+% Invalid input detected at '^' marker.
+	
+Router0(config)#
+Router0(config)#interface g0/0
+Router0(config-if)# ip address 10.2.1.6 255.255.255.252
+Router0(config-if)# no shutdown
+Router0(config-if)#exit
+00:17:27: %OSPF-5-ADJCHG: Process 1, Nbr 44.44.44.44 on GigabitEthernet0/0 from FULL to DOWN, Neighbor Down: Interface down or detached
+
+Router0(config)#router ospf 1
+Router0(config-router)# router-id 2.2.2.2
+Router0(config-router)# network 10.2.1.4 0.0.0.3 area 0
+Router0(config-router)# network 192.198.11.64 0.0.0.15 area 0
+Router0(config-router)# network 192.198.11.0 0.0.0.63 area 0Reload or use "clear ip ospf process" command, for this to take effect
+
+
+Router0(config-router)#passive-interface g0/1.10
+Router0(config-router)#passive-interface g0/1.20
+Router0(config-router)#exit
+Router0(config)#end
+Router0#write memory
+Building configuration...
+[OK]
+Router0#show standby brief
+                     P indicates configured to preempt.
+                     |
+Interface   Grp  Pri P State    Active          Standby         Virtual IP
+Gig         10   90  P Standby  192.198.11.66   local           192.198.11.65  
+Gig         20   110 P Active   local           192.198.11.3    192.198.11.1   
+Router0#show ip ospf neighbor
+
+Router0#show ip route
+%SYS-5-CONFIG_I: Configured from console by console
+
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2, E - EGP
+       i - IS-IS, L1 - IS-IS level-1, L2 - IS-IS level-2, ia - IS-IS inter area
+       * - candidate default, U - per-user static route, o - ODR
+       P - periodic downloaded static route
+
+Gateway of last resort is not set
+
+     10.0.0.0/8 is variably subnetted, 2 subnets, 2 masks
+C       10.2.1.4/30 is directly connected, GigabitEthernet0/0
+L       10.2.1.6/32 is directly connected, GigabitEthernet0/0
+     192.198.11.0/24 is variably subnetted, 4 subnets, 3 masks
+C       192.198.11.0/26 is directly connected, GigabitEthernet0/1.20
+L       192.198.11.2/32 is directly connected, GigabitEthernet0/1.20
+C       192.198.11.64/28 is directly connected, GigabitEthernet0/1.10
+L       192.198.11.67/32 is directly connected, GigabitEthernet0/1.10
+
+
+
+
+
+conf t
+no interface port-channel 1
+default interface fa0/17
+default interface fa0/18
+default interface fa0/19
+default interface fa0/20
