@@ -5,16 +5,12 @@
 **Ingeniería en Ciencias y Sistemas**  
 **Curso: Redes de Computadoras 2**
 
----
-
 ## Datos del Grupo
 
 | Campo            | Detalle    |
 | ---------------- | ---------- |
 | Número de Grupo  | 28         |
 | Fecha de Entrega | 27/03/2026 |
-
----
 
 ## Integrantes
 
@@ -23,8 +19,6 @@
 | 1   | _David Estuardo Barrios Ramírez_ | _202300670_ |
 | 2   | _Marcos Daniel Bonifasi de Leon_ | _202202410_ |
 | 3   | _Enner Esaí Mendizabal Castro_   | _202302220_ |
-
----
 
 ## Índice
 
@@ -44,8 +38,6 @@
 14. [Pruebas de Conectividad](#14-pruebas-de-conectividad)
 15. [Conclusiones](#15-conclusiones)
 
----
-
 ## 1. Introducción
 
 La Facultad de Ingeniería de la Universidad de San Carlos de Guatemala (USAC) atraviesa un proceso de modernización de su infraestructura tecnológica, impulsado por el crecimiento continuo de su población estudiantil y la creciente demanda de servicios digitales dentro del campus. En este contexto, el edificio de la biblioteca representa un área crítica que requiere atención inmediata, ya que su red actual no satisface adecuadamente las necesidades de conectividad y rendimiento que exigen las actividades académicas diarias.
@@ -53,8 +45,6 @@ La Facultad de Ingeniería de la Universidad de San Carlos de Guatemala (USAC) a
 La presente práctica documenta el diseño, configuración e implementación de una nueva topología de red para el edificio de la biblioteca de ingeniería, desarrollada en el simulador **Cisco Packet Tracer**. La solución propuesta abarca tres pisos del edificio: el primero con infraestructura cableada tradicional y los pisos segundo y tercero con zonas de acceso inalámbrico (WiFi), todo interconectado con el Data Center de la Biblioteca Central del campus.
 
 La arquitectura diseñada integra tecnologías de capa 2 y capa 3, incluyendo VLANs, LACP, OSPF, HSRP, DHCP, DNS y HTTP, con el objetivo de garantizar alta disponibilidad, seguridad, escalabilidad y tolerancia a fallos en las comunicaciones internas y externas del edificio.
-
----
 
 ## 2. Objetivos
 
@@ -73,8 +63,6 @@ Diseñar e implementar una infraestructura de red completa para el edificio de l
 - Configurar HSRP en el primer piso y en el Data Center para asegurar redundancia de gateway y alta disponibilidad ante fallos de routers.
 - Elaborar un manual técnico detallado que documente todas las configuraciones realizadas.
 
----
-
 ## 3. Descripción del Problema
 
 La biblioteca de la Facultad de Ingeniería de la USAC presenta deficiencias críticas en su infraestructura de red que impactan negativamente el desempeño académico de los estudiantes. Los principales problemas identificados son los siguientes:
@@ -86,8 +74,6 @@ La biblioteca de la Facultad de Ingeniería de la USAC presenta deficiencias cr�
 - **Ancho de banda insuficiente** en los enlaces entre edificios del campus, generando cuellos de botella en horas pico.
 
 Para resolver estos problemas, el equipo de especialistas en redes del **Grupo 28** propone la topología descrita en este documento, que aborda cada uno de los puntos anteriores mediante el uso de tecnologías estándar de la industria.
-
----
 
 ## 4. Topología Propuesta
 
@@ -104,9 +90,10 @@ La red está compuesta por cuatro secciones principales interconectadas:
 
 La interconexión entre secciones se realiza mediante **EtherChannel LACP** utilizando 4 interfaces físicas por enlace, lo que proporciona un mayor ancho de banda agregado y redundancia ante fallos de enlace individuales.
 
-**Data Center - Biblioteca Central**
-| Dispositivo Origen | Puerto | Dispositivo Destino |Puerto |
-| -------------------------------- | -------------------------------------------------------------------------------- | ----------- |----------- |
+**Data Center — Biblioteca Central**
+
+| Dispositivo Origen | Puerto             | Dispositivo Destino | Puerto             |
+| ------------------ | ------------------ | ------------------- | ------------------ |
 | Multilayer Switch2 | GigabitEthernet0/1 | Router2 | GigabitEthernet0/0 |
 | Multilayer Switch2 | GigabitEthernet0/2 | Router3 | GigabitEthernet0/0 |
 | Router2 | GigabitEthernet0/1 | Switch3 | GigabitEthernet0/1 |
@@ -125,7 +112,7 @@ La interconexión entre secciones se realiza mediante **EtherChannel LACP** util
 | Switch0            | FastEthernet0/24   | PC1                 | FastEthernet0      |
 | Switch0            | FastEthernet0/23   | Laptop1             | FastEthernet0      |
 
-**Conexión Data Center - Piso1**
+**Conexión Data Center — Piso 1**
 
 | Dispositivo Origen | Puerto           | Dispositivo Destino | Puerto           |
 | ------------------ | ---------------- | ------------------- | ---------------- |
@@ -135,11 +122,12 @@ La interconexión entre secciones se realiza mediante **EtherChannel LACP** util
 | Multilayer Switch2 | FastEthernet0/21 | Multilayer Switch4  | FastEthernet0/21 |
 
 **Piso 2**
-| Dispositivo Origen | Puerto | Dispositivo Destino | Puerto |
-| ------------------ | -------------- | ------------------- | -------------- |
-| Multilayer Switch0 | GigabitEthernet0/1 | Wireless Router0 | Internet|
-| Multilayer Switch0 | GigabitEthernet0/2 | Wireless Router1 | Internet|
-| Wireless Router0 | Ethernet1 | PC3 | FastEthernet0 |
+
+| Dispositivo Origen | Puerto             | Dispositivo Destino | Puerto        |
+| ------------------ | ------------------ | ------------------- | ------------- |
+| Multilayer Switch0 | GigabitEthernet0/1 | Wireless Router0    | Internet      |
+| Multilayer Switch0 | GigabitEthernet0/2 | Wireless Router1    | Internet      |
+| Wireless Router0   | Ethernet1          | PC3                 | FastEthernet0 |
 
 **Conexión de Piso 2 con Piso 1**
 
@@ -567,8 +555,6 @@ En esta práctica, el **ServerDHCP** ubicado en el Data Center es el servidor ce
 
 Los Wireless Routers de los pisos 2 y 3 actúan como servidores DHCP locales para sus propias redes inalámbricas, por lo que se configuran de forma independiente y se documentan en la **Sección 8 — Configuración Inalámbrica**.
 
----
-
 ### 7.1 Configuración de IP estática en ServerWeb
 
 El ServerWeb requiere una dirección IP estática ya que es el servidor DNS y HTTP de toda la red. Los dispositivos clientes apuntarán a esta IP para resolver nombres de dominio, por lo que no puede cambiar dinámicamente.
@@ -589,8 +575,6 @@ El ServerWeb requiere una dirección IP estática ya que es el servidor DNS y HT
 
 > **Nota sobre el Default Gateway:** El gateway `192.198.100.1` es la **IP virtual HSRP** de la VLAN 30, configurada en la Sección 12. Mientras HSRP no esté configurado, se puede usar temporalmente `192.198.100.3` (IP real de Router2) para pruebas de conectividad. Una vez configurado HSRP, se debe restaurar a `192.198.100.1`.
 
----
-
 ### 7.2 Configuración de IP estática en ServerDHCP
 
 El ServerDHCP también requiere una dirección IP estática para que los routers puedan reenviarle las solicitudes DHCP mediante `ip helper-address` de forma consistente.
@@ -608,8 +592,6 @@ El ServerDHCP también requiere una dirección IP estática para que los routers
 | DNS Server      | `192.198.100.2`   |
 
 > **Nota:** El DNS Server apunta a `192.198.100.2` que es la IP del ServerWeb, ya que este es quien provee el servicio DNS para toda la red.
-
----
 
 ### 7.3 Configuración de Pools DHCP en ServerDHCP
 
@@ -671,8 +653,6 @@ El ServerDHCP debe tener un pool configurado por cada VLAN que requiere direccio
 
 > **Nota:** Los pools de VLAN 30 y 40 se crean como respaldo, pero los servidores (ServerWeb y ServerDHCP) tienen IP estática, por lo que no solicitarán IP dinámica. El pool existe para cualquier dispositivo adicional que se agregue a esas VLANs en el futuro.
 
----
-
 ### 7.4 Configuración de subinterfaces en Router2 (Data Center — HSRP Activo)
 
 Router2 tiene dos interfaces físicas con roles distintos:
@@ -713,8 +693,6 @@ end
 write memory
 ```
 
----
-
 ### 7.5 Configuración de subinterfaces en Router3 (Data Center — HSRP Standby)
 
 Router3 es el router de respaldo en HSRP para el Data Center. Al igual que Router2:
@@ -754,8 +732,6 @@ exit
 end
 write memory
 ```
-
----
 
 ### 7.6 Configuración de subinterfaces en Router1 (Piso 1 — HSRP Activo VLAN 10)
 
@@ -810,8 +786,6 @@ end
 write memory
 ```
 
----
-
 ### 7.7 Configuración de subinterfaces en Router0 (Piso 1 — HSRP Activo VLAN 20)
 
 Router0 es el router activo para VLAN 20 y standby para VLAN 10 en el Piso 1:
@@ -865,8 +839,6 @@ end
 write memory
 ```
 
----
-
 ### 7.8 Verificación de DHCP
 
 Una vez configurados todos los dispositivos, se puede verificar el correcto funcionamiento del servicio DHCP con los siguientes comandos:
@@ -892,18 +864,13 @@ show ip interface brief
 
 ![Router1 DHCP](img/DHCP/Router1_DHCP.png)
 
-
-
-
 ## 8. Configuración Inalámbrica
 
 Para proporcionar conectividad en los pisos superiores de la biblioteca, se implementaron zonas de acceso inalámbrico eficientes y seguras. Para ello, se utilizaron routers inalámbricos modelo WRT300N conectados a los Multilayer Switches de cada piso.
 
 A diferencia de la red cableada que recibe sus direcciones IP del servidor central en el Data Center, cada router inalámbrico WRT300N funciona como su propio servidor DHCP local, administrando el direccionamiento dinámico para los clientes de su red inalámbrica específica (WLAN).
 
----
-
-### 8.1. Parámetros Inalámbricos Generales
+###  Parámetros Inalámbricos Generales
 
 Las configuraciones de seguridad y de red varían dependiendo del piso, siguiendo los lineamientos establecidos para la práctica:
 
@@ -916,10 +883,7 @@ Las configuraciones de seguridad y de red varían dependiendo del piso, siguiend
 | Contraseña de Red     | G0_PISO2       | G0_PISO3       |
 | Contraseña del Router | Grupo0_P2      | Grupo0_P3      |
 
-
----
-
-### 8.2. Configuración de Routers Inalámbricos — Piso 2
+###  Configuración de Routers Inalámbricos — Piso 2
 
 El Piso 2 utiliza la red general `192.198.20.0/24`, dividida en dos subredes `/25` mediante FLSM para soportar 80 hosts por WLAN.
 
@@ -946,8 +910,6 @@ Toda la configuración de estos dispositivos se realiza a través de su interfaz
 **Contraseña de Administración** *(Administration → Management)*
 - Router Password: `Grupo0_P2`
 
----
-
 #### Wireless Router1 (WLAN 2)
 
 **Configuración LAN / DHCP** *(Setup → Basic Setup)*
@@ -969,9 +931,7 @@ Toda la configuración de estos dispositivos se realiza a través de su interfaz
 **Contraseña de Administración** *(Administration → Management)*
 - Router Password: `Grupo0_P2`
 
----
-
-### 8.3. Configuración de Routers Inalámbricos — Piso 3
+###  Configuración de Routers Inalámbricos — Piso 3
 
 El Piso 3 utiliza la red general `192.198.30.0/24`, dividida equitativamente en dos subredes `/25` para soportar la demanda de 80 hosts por WLAN. A diferencia del piso 2, en este piso el Broadcast SSID se encuentra visible.
 
@@ -996,8 +956,6 @@ El Piso 3 utiliza la red general `192.198.30.0/24`, dividida equitativamente en 
 **Contraseña de Administración** *(Administration → Management)*
 - Router Password: `Grupo0_P3`
 
----
-
 #### Wireless Router0(1) (WLAN 2)
 
 **Configuración LAN / DHCP** *(Setup → Basic Setup)*
@@ -1019,9 +977,7 @@ El Piso 3 utiliza la red general `192.198.30.0/24`, dividida equitativamente en 
 **Contraseña de Administración** *(Administration → Management)*
 - Router Password: `Grupo0_P3`
 
----
-
-### 8.4. Comandos de los Multilayer Switches (Piso 2 y Piso 3)
+###  Comandos de los Multilayer Switches (Piso 2 y Piso 3)
 
 Los Multilayer Switches de estos pisos actúan como concentradores de la red inalámbrica. Sus puertos de acceso hacia los WRT300N operan como enlaces troncales (trunks), y su conexión de bajada hacia el Multilayer Switch4 (Piso 1) se realiza a través de un enlace de agregación (LACP) configurado en modo pasivo.
 
@@ -1117,15 +1073,6 @@ end
 write memory
 ```
 
-
-
-
-
-
-
-
-
-
 ## 9. Configuración DNS y Servidor Web
 
 El **DNS (Domain Name System)** es un servicio de red que traduce nombres de dominio legibles por humanos (como `www.practica2_Grupo0.com`) en direcciones IP que los dispositivos de red pueden utilizar para establecer comunicaciones. Sin DNS, los usuarios tendrían que recordar la dirección IP numérica de cada servicio al que deseen acceder.
@@ -1137,8 +1084,6 @@ El dominio configurado para esta práctica es: **`www.practica2_Grupo0.com`**
 Cuando cualquier dispositivo de la red ingrese este dominio en su navegador, el ServerWeb primero resolverá el nombre a la IP `192.198.100.2` mediante DNS, y luego servirá la página web estática mediante HTTP.
 
 > **Nota:** Toda la configuración del ServerWeb se realiza desde la **interfaz gráfica** de Packet Tracer, ya que el dispositivo Server-PT no dispone de CLI para configurar servicios como DNS y HTTP.
-
----
 
 ### 9.1 Configuración del Servicio DNS en ServerWeb
 
@@ -1176,8 +1121,6 @@ El servicio DNS necesita tener al menos dos tipos de registros configurados:
 | Name        | `practica2_Grupo0.com`     |
 | Type        | `NS`                       |
 | Server Name | `www.practica2_Grupo0.com` |
-
----
 
 ### 9.2 Configuración del Servicio HTTP en ServerWeb
 
@@ -1289,8 +1232,6 @@ El servicio HTTP aloja la página web estática que se desplegará al ingresar e
 
 6. Hacer clic en **Save** para guardar los cambios.
 
----
-
 ### 9.3 Verificación del Servicio DNS
 
 Para verificar que el DNS está resolviendo correctamente el dominio, se puede usar el comando `nslookup` desde cualquier PC de la red que ya tenga conectividad con el ServerWeb.
@@ -1309,8 +1250,6 @@ nslookup www.practica2_Grupo0.com
 # Name:    www.practica2_Grupo0.com
 # Address: 192.198.100.2
 ```
-
----
 
 ### 9.4 Verificación del Servicio HTTP
 
@@ -1335,8 +1274,6 @@ También se puede acceder directamente por IP para verificar que HTTP funciona i
 
 En esta práctica se utiliza OSPF porque el Grupo 28 es par. Todos los dispositivos se configuran en el **Área 0** (área backbone) con **Process ID 1**.
 
----
-
 ### 10.1 Arquitectura de enrutamiento
 
 El enrutamiento entre edificios sigue esta jerarquía:
@@ -1358,8 +1295,6 @@ Los Multilayer Switches transportan tráfico en **capa 2** a través del Port-Ch
 | Router1     | 1.1.1.1     | 10.2.1.0/30, 192.198.10.64/28, 192.198.10.0/26                               |
 | Router0     | 2.2.2.2     | 10.2.1.4/30, 192.198.10.64/28, 192.198.10.0/26                               |
 
----
-
 ### 10.2 Configuración OSPF en Router2 (Data Center)
 
 ```bash
@@ -1379,8 +1314,6 @@ end
 write memory
 ```
 
----
-
 ### 10.3 Configuración OSPF en Router3 (Data Center)
 
 ```bash
@@ -1399,8 +1332,6 @@ exit
 end
 write memory
 ```
-
----
 
 ### 10.4 Configuración OSPF en Multilayer Switch2 (Data Center)
 
@@ -1423,8 +1354,6 @@ end
 write memory
 ```
 
----
-
 ### 10.5 Configuración OSPF en Multilayer Switch4 (Piso 1)
 
 MS4 participa en OSPF a través de sus routed ports (`Gi0/1` hacia Router1, `Gi0/2` hacia Router0) y sus EtherChannels capa 3 (`Po6` hacia Piso 2, `Po7` hacia Piso 3, `Po8` hacia Data Center).
@@ -1445,8 +1374,6 @@ exit
 end
 write memory
 ```
-
----
 
 ### 10.6 Configuración OSPF en Router1 (Piso 1)
 
@@ -1469,8 +1396,6 @@ end
 write memory
 ```
 
----
-
 ### 10.7 Configuración OSPF en Router0 (Piso 1)
 
 Router0 anuncia su propio enlace puntual hacia MS4 y las mismas subredes de VLANs. OSPF equilibra la carga entre Router0 y Router1 automáticamente (mismo costo hacia las VLANs), pero HSRP asegura un único gateway activo por VLAN.
@@ -1491,8 +1416,6 @@ exit
 end
 write memory
 ```
-
----
 
 ### 10.8 Verificación de OSPF
 
@@ -1552,8 +1475,6 @@ Los EtherChannels del Piso 1 se implementan como **enlaces de capa 3** (routed p
 | Po8          | Piso 1 ↔ Data Center    | `Fa0/21 - Fa0/24` | MS2 (DC): `Fa0/21-24`      | 10.2.1.17/30| 10.2.1.18/30|
 
 > **Nota importante:** En LACP, un extremo se configura como **active** (inicia la negociación) y el otro como **active** también puede funcionar, o como **passive** (solo responde). En esta práctica ambos extremos usan `mode active`.
-
----
 
 ### 11.1 Configuración LACP en Multilayer Switch4 (Piso 1 — capa 3)
 
@@ -1615,9 +1536,7 @@ end
 write memory
 ```
 
----
-
-### 11.2 Configuración LACP en Multilayer Switch2 (Data Center — Passive)
+### 11.2 Configuración LACP en Multilayer Switch2 (Data Center — Pasivo)
 
 ```bash
 enable
@@ -1643,9 +1562,7 @@ write memory
 
 > **Nota:** La configuración de Multilayer Switch0 (Piso 2) y Multilayer Switch3 (Piso 3) se documenta en las secciones 11.3 y 11.4 respectivamente.
 
----
-
-### 11.3 Configuración LACP en Multilayer Switch0 (Piso 2 — Passive)
+### 11.3 Configuración LACP en Multilayer Switch0 (Piso 2 — Pasivo)
 
 ```bash
 enable
@@ -1668,9 +1585,7 @@ end
 write memory
 ```
 
----
-
-### 11.4 Configuración LACP en Multilayer Switch3 (Piso 3 — Passive)
+### 11.4 Configuración LACP en Multilayer Switch3 (Piso 3 — Pasivo)
 
 ```bash
 enable
@@ -1741,9 +1656,7 @@ En esta práctica, HSRP se configura en dos lugares:
 - **Piso 1** (secciones 12.1–12.4): Router0 y Router1, para las VLANs 10 y 20
 - **Data Center** (secciones 12.5–12.9): Router2 y Router3, para las VLANs 30 y 40
 
----
-
-## HSRP — Piso 1
+### HSRP — Piso 1
 
 En el Piso 1 se implementa **HSRP con balanceo de carga**: cada router es activo para una VLAN distinta. Esto aprovecha ambos enlaces y evita que un router quede ocioso.
 
@@ -1760,8 +1673,6 @@ Las IPs virtuales HSRP del Piso 1 son:
 | VLAN 20 — ESTUDIANTES    | 192.198.10.0/26   | `192.198.10.1`   | Gateway de Estudiantes        |
 
 > **Importante:** HSRP se configura en las **subinterfaces** `Gi0/1.10` y `Gi0/1.20` de cada router. Las IPs virtuales son las primeras direcciones usables de cada subred y son las que se configuran como Default Gateway en los pools DHCP y en los hosts estáticos.
-
----
 
 ### 12.1 Configuración HSRP en Router1 (Activo VLAN 10 / Standby VLAN 20)
 
@@ -1787,8 +1698,6 @@ end
 write memory
 ```
 
----
-
 ### 12.2 Configuración HSRP en Router0 (Standby VLAN 10 / Activo VLAN 20)
 
 ```bash
@@ -1812,8 +1721,6 @@ exit
 end
 write memory
 ```
-
----
 
 ### 12.3 Verificación HSRP Piso 1
 
@@ -1845,19 +1752,15 @@ Gig0/1.10   10   90  P Standby  192.198.10.66   local           192.198.10.65
 Gig0/1.20   20   110 P Active   local           192.198.10.3    192.198.10.1
 ```
 
----
-
 ### 12.4 Prueba de failover HSRP Piso 1
 
-1. Con Router1 activo en VLAN 10, hacer ping desde un PC en VLAN 10 hacia cualquier destino — debe responder ✅
+1. Con Router1 activo en VLAN 10, hacer ping desde un PC en VLAN 10 hacia cualquier destino — debe responder (OK)
 2. Apagar Router1 en Packet Tracer (clic derecho → Power Off)
 3. Esperar ~10 segundos para que Router0 asuma el rol activo en VLAN 10
-4. Hacer ping nuevamente — debe seguir respondiendo a través de Router0 ✅
-5. Encender Router1 nuevamente — retoma el rol activo gracias a `preempt` ✅
+4. Hacer ping nuevamente — debe seguir respondiendo a través de Router0 (OK)
+5. Encender Router1 nuevamente — retoma el rol activo gracias a `preempt` (OK)
 
----
-
-## HSRP — Data Center
+### HSRP — Data Center
 
 En el Data Center, Router2 es el router activo para ambas VLANs (30 y 40).
 
@@ -1874,8 +1777,6 @@ Las IPs virtuales HSRP del Data Center son:
 | VLAN 40 — DHCP_SERVERS | `192.198.100.129` | Gateway del ServerDHCP |
 
 > **Importante:** HSRP se configura en las **subinterfaces** `Gi0/1.30` y `Gi0/1.40` de cada router, ya que es por `Gi0/1` donde están conectados los servidores a través de Switch3.
-
----
 
 ### 12.5 Configuración HSRP en Router2 (Activo)
 
@@ -1901,8 +1802,6 @@ end
 write memory
 ```
 
----
-
 ### 12.6 Configuración HSRP en Router3 (Standby)
 
 ```bash
@@ -1922,8 +1821,6 @@ exit
 end
 write memory
 ```
-
----
 
 ### 12.7 Restaurar gateways de los servidores
 
@@ -1946,8 +1843,6 @@ Una vez configurado HSRP, los servidores deben usar la **IP virtual** como gatew
 | Subnet Mask     | `255.255.255.128` |
 | Default Gateway | `192.198.100.129` |
 | DNS Server      | `192.198.100.2`   |
-
----
 
 ### 12.8 Verificación de HSRP Data Center
 
@@ -1978,17 +1873,15 @@ Gi0/1.30    30   100   Standby  192.198.100.3   local           192.198.100.1
 Gi0/1.40    40   100   Standby  192.198.100.131 local           192.198.100.129
 ```
 
----
-
 ### 12.9 Prueba de failover HSRP Data Center
 
 Para verificar que HSRP funciona correctamente ante un fallo:
 
-1. Con Router2 activo, hacer ping desde Router1 hacia `192.198.100.2` — debe responder ✅
+1. Con Router2 activo, hacer ping desde Router1 hacia `192.198.100.2` — debe responder (OK)
 2. Apagar Router2 en Packet Tracer (clic derecho → Power Off)
 3. Esperar 10 segundos para que Router3 tome el rol activo
-4. Hacer ping nuevamente desde Router1 hacia `192.198.100.2` — debe seguir respondiendo ✅
-5. Encender Router2 nuevamente — debe retomar el rol activo gracias a `preempt` ✅
+4. Hacer ping nuevamente desde Router1 hacia `192.198.100.2` — debe seguir respondiendo (OK)
+5. Encender Router2 nuevamente — debe retomar el rol activo gracias a `preempt` (OK)
 
 ```bash
 # Desde Router1 — prueba antes del fallo
@@ -2000,21 +1893,4 @@ ping 192.198.100.2
 # Ver que Router3 tomó el rol activo
 show standby brief
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
