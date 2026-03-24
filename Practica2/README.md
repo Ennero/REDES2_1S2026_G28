@@ -12,7 +12,6 @@
 | Campo            | Detalle    |
 | ---------------- | ---------- |
 | Número de Grupo  | 28         |
-| Valor de X       | 0          |
 | Fecha de Entrega | 27/03/2026 |
 
 ---
@@ -893,7 +892,239 @@ show ip interface brief
 
 ![Router1 DHCP](img/DHCP/Router1_DHCP.png)
 
-## 8. Configuración-inalámbrica
+
+
+
+## 8. Configuración Inalámbrica
+
+Para proporcionar conectividad en los pisos superiores de la biblioteca, se implementaron zonas de acceso inalámbrico eficientes y seguras. Para ello, se utilizaron routers inalámbricos modelo WRT300N conectados a los Multilayer Switches de cada piso.
+
+A diferencia de la red cableada que recibe sus direcciones IP del servidor central en el Data Center, cada router inalámbrico WRT300N funciona como su propio servidor DHCP local, administrando el direccionamiento dinámico para los clientes de su red inalámbrica específica (WLAN).
+
+---
+
+### 8.1. Parámetros Inalámbricos Generales
+
+Las configuraciones de seguridad y de red varían dependiendo del piso, siguiendo los lineamientos establecidos para la práctica:
+
+| Parámetro             | Piso 2         | Piso 3         |
+|-----------------------|----------------|----------------|
+| SSID (Router 1)       | PISO2_G0_R1    | PISO3_G0_R1    |
+| SSID (Router 2)       | PISO2_G0_R2    | PISO3_G0_R3    |
+| Broadcast SSID        | Deshabilitado (No) | Habilitado (Sí) |
+| Seguridad             | WPA2 Personal  | WPA2 Personal  |
+| Contraseña de Red     | G0_PISO2       | G0_PISO3       |
+| Contraseña del Router | Grupo0_P2      | Grupo0_P3      |
+
+
+---
+
+### 8.2. Configuración de Routers Inalámbricos — Piso 2
+
+El Piso 2 utiliza la red general `192.198.20.0/24`, dividida en dos subredes `/25` mediante FLSM para soportar 80 hosts por WLAN.
+
+Toda la configuración de estos dispositivos se realiza a través de su interfaz gráfica (GUI) en la pestaña GUI de Packet Tracer.
+
+#### Wireless Router0 (WLAN 1)
+
+**Configuración LAN / DHCP** *(Setup → Basic Setup)*
+- IP Address: `192.198.20.1`
+- Subnet Mask: `255.255.255.128`
+- DHCP Server: `Enable`
+- Start IP Address: `192.198.20.2`
+- Maximum Number of Users: `80`
+
+**Configuración WiFi** *(Wireless → Basic Wireless Settings)*
+- Network Name (SSID): `PISO2_G0_R1`
+- SSID Broadcast: `Disabled`
+
+**Seguridad WiFi** *(Wireless → Wireless Security)*
+- Security Mode: `WPA2 Personal`
+- Encryption: `AES`
+- Passphrase: `G0_PISO2`
+
+**Contraseña de Administración** *(Administration → Management)*
+- Router Password: `Grupo0_P2`
+
+---
+
+#### Wireless Router1 (WLAN 2)
+
+**Configuración LAN / DHCP** *(Setup → Basic Setup)*
+- IP Address: `192.198.20.129`
+- Subnet Mask: `255.255.255.128`
+- DHCP Server: `Enable`
+- Start IP Address: `192.198.20.130`
+- Maximum Number of Users: `80`
+
+**Configuración WiFi** *(Wireless → Basic Wireless Settings)*
+- Network Name (SSID): `PISO2_G0_R2`
+- SSID Broadcast: `Disabled`
+
+**Seguridad WiFi** *(Wireless → Wireless Security)*
+- Security Mode: `WPA2 Personal`
+- Encryption: `AES`
+- Passphrase: `G0_PISO2`
+
+**Contraseña de Administración** *(Administration → Management)*
+- Router Password: `Grupo0_P2`
+
+---
+
+### 8.3. Configuración de Routers Inalámbricos — Piso 3
+
+El Piso 3 utiliza la red general `192.198.30.0/24`, dividida equitativamente en dos subredes `/25` para soportar la demanda de 80 hosts por WLAN. A diferencia del piso 2, en este piso el Broadcast SSID se encuentra visible.
+
+#### Wireless Router2 (WLAN 1)
+
+**Configuración LAN / DHCP** *(Setup → Basic Setup)*
+- IP Address: `192.198.30.1`
+- Subnet Mask: `255.255.255.128`
+- DHCP Server: `Enable`
+- Start IP Address: `192.198.30.2`
+- Maximum Number of Users: `80`
+
+**Configuración WiFi** *(Wireless → Basic Wireless Settings)*
+- Network Name (SSID): `PISO3_G0_R1`
+- SSID Broadcast: `Enabled`
+
+**Seguridad WiFi** *(Wireless → Wireless Security)*
+- Security Mode: `WPA2 Personal`
+- Encryption: `AES`
+- Passphrase: `G0_PISO3`
+
+**Contraseña de Administración** *(Administration → Management)*
+- Router Password: `Grupo0_P3`
+
+---
+
+#### Wireless Router0(1) (WLAN 2)
+
+**Configuración LAN / DHCP** *(Setup → Basic Setup)*
+- IP Address: `192.198.30.129`
+- Subnet Mask: `255.255.255.128`
+- DHCP Server: `Enable`
+- Start IP Address: `192.198.30.130`
+- Maximum Number of Users: `80`
+
+**Configuración WiFi** *(Wireless → Basic Wireless Settings)*
+- Network Name (SSID): `PISO3_G0_R3`
+- SSID Broadcast: `Enabled`
+
+**Seguridad WiFi** *(Wireless → Wireless Security)*
+- Security Mode: `WPA2 Personal`
+- Encryption: `AES`
+- Passphrase: `G0_PISO3`
+
+**Contraseña de Administración** *(Administration → Management)*
+- Router Password: `Grupo0_P3`
+
+---
+
+### 8.4. Comandos de los Multilayer Switches (Piso 2 y Piso 3)
+
+Los Multilayer Switches de estos pisos actúan como concentradores de la red inalámbrica. Sus puertos de acceso hacia los WRT300N operan como enlaces troncales (trunks), y su conexión de bajada hacia el Multilayer Switch4 (Piso 1) se realiza a través de un enlace de agregación (LACP) configurado en modo pasivo.
+
+#### Configuración Multilayer Switch0 (Piso 2)
+```bash
+enable
+configure terminal
+
+# Habilitar enrutamiento
+ip routing
+
+# Crear VLANs
+vlan 10
+name ADMIN
+exit
+vlan 20
+name ESTUDIANTES
+exit
+
+# Configurar puertos hacia los WRT300N como troncales
+interface GigabitEthernet0/1
+switchport trunk encapsulation dot1q
+switchport mode trunk
+no shutdown
+exit
+
+interface GigabitEthernet0/2
+switchport trunk encapsulation dot1q
+switchport mode trunk
+no shutdown
+exit
+
+# Configurar LACP hacia Piso 1 (Port-Channel 2)
+interface range FastEthernet0/21 - 24
+channel-group 2 mode passive
+no shutdown
+exit
+
+interface Port-channel2
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allowed vlan 10,20,30,40
+no shutdown
+exit
+
+end
+write memory
+```
+
+#### Configuración Multilayer Switch3 (Piso 3)
+```bash
+enable
+configure terminal
+
+# Habilitar enrutamiento
+ip routing
+
+# Crear VLANs
+vlan 10
+name ADMIN
+exit
+vlan 20
+name ESTUDIANTES
+exit
+
+# Configurar puertos hacia los WRT300N como troncales
+interface GigabitEthernet0/1
+switchport trunk encapsulation dot1q
+switchport mode trunk
+no shutdown
+exit
+
+interface GigabitEthernet0/2
+switchport trunk encapsulation dot1q
+switchport mode trunk
+no shutdown
+exit
+
+# Configurar LACP hacia Piso 1 (Port-Channel 3)
+interface range FastEthernet0/21 - 24
+channel-group 3 mode passive
+no shutdown
+exit
+
+interface Port-channel3
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allowed vlan 10,20,30,40
+no shutdown
+exit
+
+end
+write memory
+```
+
+
+
+
+
+
+
+
+
 
 ## 9. Configuración DNS y Servidor Web
 
@@ -1769,3 +2000,21 @@ ping 192.198.100.2
 # Ver que Router3 tomó el rol activo
 show standby brief
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
