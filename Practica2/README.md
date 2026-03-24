@@ -91,14 +91,14 @@ La red está compuesta por cuatro secciones principales interconectadas:
 La interconexión entre secciones se realiza mediante **EtherChannel LACP** utilizando 4 interfaces físicas por enlace, lo que proporciona un mayor ancho de banda agregado y redundancia ante fallos de enlace individuales.
 
 **Data Center - Biblioteca Central**
-| Dispositivo Origen | Puerto | Dispositivo Destino |Puerto |
-| -------------------------------- | -------------------------------------------------------------------------------- | ----------- |----------- |
-| Multilayer Switch2 | GigabitEthernet0/1 | Router2 | GigabitEthernet0/0 |
-| Multilayer Switch2 | GigabitEthernet0/2 | Router3 | GigabitEthernet0/0 |
-| Router2 | GigabitEthernet0/1 | Switch3 | GigabitEthernet0/1 |
-| Router3 | GigabitEthernet0/1 | Switch3 | GigabitEthernet0/2 |
-| Switch3 | FastEthernet0/24 | Server Web | FastEthernet0 |
-| Switch3 | FastEthernet0/23 | Server DHCP | FastEthernet0 |
+| Dispositivo Origen | Puerto             | Dispositivo Destino | Puerto             |
+| ------------------ | ------------------ | ------------------- | ------------------ |
+| Multilayer Switch2 | GigabitEthernet0/1 | Router2             | GigabitEthernet0/0 |
+| Multilayer Switch2 | GigabitEthernet0/2 | Router3             | GigabitEthernet0/0 |
+| Router2            | GigabitEthernet0/1 | Switch3             | GigabitEthernet0/1 |
+| Router3            | GigabitEthernet0/1 | Switch3             | GigabitEthernet0/2 |
+| Switch3            | FastEthernet0/24   | Server Web          | FastEthernet0      |
+| Switch3            | FastEthernet0/23   | Server DHCP         | FastEthernet0      |
 
 **Piso 1**
 
@@ -121,11 +121,11 @@ La interconexión entre secciones se realiza mediante **EtherChannel LACP** util
 | Multilayer Switch2 | FastEthernet0/21 | Multilayer Switch4  | FastEthernet0/21 |
 
 **Piso 2**
-| Dispositivo Origen | Puerto | Dispositivo Destino | Puerto |
-| ------------------ | -------------- | ------------------- | -------------- |
-| Multilayer Switch0 | GigabitEthernet0/1 | Wireless Router0 | Internet|
-| Multilayer Switch0 | GigabitEthernet0/2 | Wireless Router1 | Internet|
-| Wireless Router0 | Ethernet1 | PC3 | FastEthernet0 |
+| Dispositivo Origen | Puerto             | Dispositivo Destino | Puerto        |
+| ------------------ | ------------------ | ------------------- | ------------- |
+| Multilayer Switch0 | GigabitEthernet0/1 | Wireless Router0    | Internet      |
+| Multilayer Switch0 | GigabitEthernet0/2 | Wireless Router1    | Internet      |
+| Wireless Router0   | Ethernet1          | PC3                 | FastEthernet0 |
 
 **Conexión de Piso 2 con Piso 1**
 
@@ -159,38 +159,38 @@ La interconexión entre secciones se realiza mediante **EtherChannel LACP** util
 
 | Red          | Dirección Base   | Uso                                |
 | ------------ | ---------------- | ---------------------------------- |
-| Piso 1       | 192.198.10.0/24  | Red cableada (ADMIN + ESTUDIANTES) |
-| Piso 2       | 192.198.20.0/24  | Red inalámbrica (WLAN1 + WLAN2)    |
-| Piso 3       | 192.198.30.0/24  | Red inalámbrica (WLAN1 + WLAN2)    |
+| Piso 1       | 192.198.11.0/24  | Red cableada (ADMIN + ESTUDIANTES) |
+| Piso 2       | 192.198.21.0/24  | Red inalámbrica (WLAN1 + WLAN2)    |
+| Piso 3       | 192.198.31.0/24  | Red inalámbrica (WLAN1 + WLAN2)    |
 | Data Center  | 192.198.100.0/24 | Servidores (WEB + DHCP)            |
-| Enrutamiento | 10.2.0.0/24      | Enlaces entre routers y switches   |
+| Enrutamiento | 10.2.1.0/24      | Enlaces entre routers y switches   |
 
-### 5.2 Piso 1 — VLSM (192.198.10.0/24)
+### 5.2 Piso 1 — VLSM (192.198.11.0/24)
 
 Se aplica VLSM ya que los dos segmentos del piso 1 tienen requerimientos de hosts distintos.
 
-| VLAN | Nombre      | Hosts Requeridos | Subred Asignada   | Máscara         | Rango Usable                  | Broadcast      |
-| ---- | ----------- | ---------------- | ----------------- | --------------- | ----------------------------- | -------------- |
-| 20   | ESTUDIANTES | 60               | 192.198.10.0/26   | 255.255.255.192 | 192.198.10.1 – 192.198.10.62  | 192.198.10.63  |
-| 10   | ADMIN       | 10               | 192.198.10.64/28  | 255.255.255.240 | 192.198.10.65 – 192.198.10.78 | 192.198.10.79  |
+| VLAN | Nombre      | Hosts Requeridos | Subred Asignada  | Máscara         | Rango Usable                  | Broadcast     |
+| ---- | ----------- | ---------------- | ---------------- | --------------- | ----------------------------- | ------------- |
+| 21   | ESTUDIANTES | 60               | 192.198.11.0/26  | 255.255.255.192 | 192.198.11.1 – 192.198.11.62  | 192.198.11.63 |
+| 11   | ADMIN       | 10               | 192.198.11.64/28 | 255.255.255.240 | 192.198.11.65 – 192.198.11.78 | 192.198.11.79 |
 
-> **Nota VLSM:** Se asigna primero la subred más grande (VLAN 20, /26) y luego la más pequeña (VLAN 10, /28). La IP virtual HSRP de cada VLAN ocupa la primera dirección usable del rango.
+> **Nota VLSM:** Se asigna primero la subred más grande (VLAN 21, /26) y luego la más pequeña (VLAN 11, /28). La IP virtual HSRP de cada VLAN ocupa la primera dirección usable del rango.
 
-### 5.3 Piso 2 — FLSM (192.198.20.0/24)
+### 5.3 Piso 2 — FLSM (192.198.21.0/24)
 
 Se aplica FLSM ya que ambas WLANs tienen el mismo requerimiento de 80 hosts.
 
 | WLAN  | Hosts Requeridos | Subred Asignada   | Máscara         | Rango Usable                    | Broadcast      |
 | ----- | ---------------- | ----------------- | --------------- | ------------------------------- | -------------- |
-| WLAN1 | 80               | 192.198.20.0/25   | 255.255.255.128 | 192.198.20.1 – 192.198.20.126   | 192.198.20.127 |
-| WLAN2 | 80               | 192.198.20.128/25 | 255.255.255.128 | 192.198.20.129 – 192.198.20.254 | 192.198.20.255 |
+| WLAN1 | 80               | 192.198.21.0/25   | 255.255.255.128 | 192.198.21.1 – 192.198.21.126   | 192.198.21.127 |
+| WLAN2 | 80               | 192.198.21.128/25 | 255.255.255.128 | 192.198.21.129 – 192.198.21.254 | 192.198.21.255 |
 
-### 5.4 Piso 3 — FLSM (192.198.30.0/24)
+### 5.4 Piso 3 — FLSM (192.198.31.0/24)
 
 | WLAN  | Hosts Requeridos | Subred Asignada   | Máscara         | Rango Usable                    | Broadcast      |
 | ----- | ---------------- | ----------------- | --------------- | ------------------------------- | -------------- |
-| WLAN1 | 80               | 192.198.30.0/25   | 255.255.255.128 | 192.198.30.1 – 192.198.30.126   | 192.198.30.127 |
-| WLAN2 | 80               | 192.198.30.128/25 | 255.255.255.128 | 192.198.30.129 – 192.198.30.254 | 192.198.30.255 |
+| WLAN1 | 80               | 192.198.31.0/25   | 255.255.255.128 | 192.198.31.1 – 192.198.31.126   | 192.198.31.127 |
+| WLAN2 | 80               | 192.198.31.128/25 | 255.255.255.128 | 192.198.31.129 – 192.198.31.254 | 192.198.31.255 |
 
 ### 5.5 Data Center — FLSM (192.198.100.0/24)
 
@@ -198,22 +198,22 @@ La red del Data Center se divide en 2 partes iguales.
 
 | VLAN | Nombre       | Subred Asignada    | Máscara         | Rango Usable                      | Broadcast       |
 | ---- | ------------ | ------------------ | --------------- | --------------------------------- | --------------- |
-| 30   | WEB_SERVERS  | 192.198.100.0/25   | 255.255.255.128 | 192.198.100.1 – 192.198.100.126   | 192.198.100.127 |
-| 40   | DHCP_SERVERS | 192.198.100.128/25 | 255.255.255.128 | 192.198.100.129 – 192.198.100.254 | 192.198.100.255 |
+| 31   | WEB_SERVERS  | 192.198.100.0/25   | 255.255.255.128 | 192.198.100.1 – 192.198.100.126   | 192.198.100.127 |
+| 41   | DHCP_SERVERS | 192.198.100.128/25 | 255.255.255.128 | 192.198.100.129 – 192.198.100.254 | 192.198.100.255 |
 
-### 5.6 Red de Enrutamiento — 10.2.0.0/24
+### 5.6 Red de Enrutamiento — 10.2.1.0/24
 
 Se utilizan subredes /30 para cada enlace punto a punto entre routers y multilayer switches.
 
-| Enlace                                              | Subred       | IP Dispositivo A  | IP Dispositivo B  |
-| --------------------------------------------------- | ------------ | ----------------- | ----------------- |
-| Router2 ↔ Multilayer Switch2                        | 10.2.0.0/30  | 10.2.0.1 (R2)     | 10.2.0.2 (MS2)    |
-| Router3 ↔ Multilayer Switch2                        | 10.2.0.4/30  | 10.2.0.5 (R3)     | 10.2.0.6 (MS2)    |
-| Multilayer Switch4 ↔ Router1                        | 10.2.1.0/30  | 10.2.1.1 (MS4)    | 10.2.1.2 (R1)     |
-| Multilayer Switch4 ↔ Router0                        | 10.2.1.4/30  | 10.2.1.5 (MS4)    | 10.2.1.6 (R0)     |
-| Multilayer Switch4 ↔ MS0 (Piso 2) — LACP (Po6)     | 10.2.1.8/30  | 10.2.1.9 (MS4)    | 10.2.1.10 (MS0)   |
-| Multilayer Switch4 ↔ MS3 (Piso 3) — LACP (Po7)     | 10.2.1.12/30 | 10.2.1.13 (MS4)   | 10.2.1.14 (MS3)   |
-| Multilayer Switch4 ↔ MS2 (Data Center) — LACP (Po8) | 10.2.1.16/30 | 10.2.1.17 (MS4)   | 10.2.1.18 (MS2)   |
+| Enlace                                              | Subred       | IP Dispositivo A | IP Dispositivo B |
+| --------------------------------------------------- | ------------ | ---------------- | ---------------- |
+| Router2 ↔ Multilayer Switch2                        | 10.2.1.0/30  | 10.2.1.1 (R2)    | 10.2.1.2 (MS2)   |
+| Router3 ↔ Multilayer Switch2                        | 10.2.1.4/30  | 10.2.1.5 (R3)    | 10.2.1.6 (MS2)   |
+| Multilayer Switch4 ↔ Router1                        | 10.2.1.8/30  | 10.2.1.9 (MS4)   | 10.2.1.10 (R1)   |
+| Multilayer Switch4 ↔ Router0                        | 10.2.1.12/30 | 10.2.1.13 (MS4)  | 10.2.1.14 (R0)   |
+| Multilayer Switch4 ↔ MS0 (Piso 2) — LACP (Po6)      | 10.2.1.16/30 | 10.2.1.17 (MS4)  | 10.2.1.18 (MS0)  |
+| Multilayer Switch4 ↔ MS3 (Piso 3) — LACP (Po7)      | 10.2.1.20/30 | 10.2.1.21 (MS4)  | 10.2.1.22 (MS3)  |
+| Multilayer Switch4 ↔ MS2 (Data Center) — LACP (Po8) | 10.2.1.24/30 | 10.2.1.25 (MS4)  | 10.2.1.26 (MS2)  |
 
 ## 6. Configuración de VLANs
 
@@ -223,55 +223,55 @@ En esta práctica se configuraron 4 VLANs, cada una correspondiente a su segment
 
 | VLAN ID | Nombre       | Segmento                    |
 | ------- | ------------ | --------------------------- |
-| 10      | ADMIN        | Administración — Piso 1     |
-| 20      | ESTUDIANTES  | Estudiantes — Piso 1        |
-| 30      | WEB_SERVERS  | Servidor Web — Data Center  |
-| 40      | DHCP_SERVERS | Servidor DHCP — Data Center |
+| 11      | ADMIN        | Administración — Piso 1     |
+| 21      | ESTUDIANTES  | Estudiantes — Piso 1        |
+| 31      | WEB_SERVERS  | Servidor Web — Data Center  |
+| 41      | DHCP_SERVERS | Servidor DHCP — Data Center |
 
 ### 6.1 Configuración de VLANs en Switch3 (Data Center)
 
-Switch3 es el switch de acceso del Data Center. Conectar directamente el ServerWeb (VLAN30) y el ServerDHCP (VLAN 40). Sus puertos hacia los servidores se configuran como acceso, y su puerto hacia el Multilayer Switch2 se configurán como trunk para transportar ambas VLANs.
+Switch3 es el switch de acceso del Data Center. Conectar directamente el ServerWeb (VLAN31) y el ServerDHCP (VLAN 41). Sus puertos hacia los servidores se configuran como acceso, y su puerto hacia el Multilayer Switch2 se configurán como trunk para transportar ambas VLANs.
 
 ```bash
 # Acceder al modo de configuración
 enable
 configure terminal
 
-# Crear VLAN 30
-vlan 30
+# Crear VLAN 31
+vlan 31
 name WEB_SERVERS
 exit
 
-# Crear VLAN 40
-vlan 40
+# Crear VLAN 41
+vlan 41
 name DHCP_SERVERS
 exit
 
 # Asignar puerto de acceso al ServerWeb (FastEthernet0/24)
 interface FastEthernet0/24
 switchport mode access
-switchport access vlan 30
+switchport access vlan 31
 no shutdown
 exit
 
 # Asignar puerto de acceso al ServerDHCP (FastEthernet0/23)
 interface FastEthernet0/23
 switchport mode access
-switchport access vlan 40
+switchport access vlan 41
 no shutdown
 exit
 
 # Configurar puerto trunk hacia Router2 (GigabitEthernet0/1)
 interface GigabitEthernet0/1
 switchport mode trunk
-switchport trunk allowed vlan 30,40
+switchport trunk allowed vlan 31,41
 no shutdown
 exit
 
 # Configurar puerto trunk hacia Router3 (GigabitEthernet0/2)
 interface GigabitEthernet0/2
 switchport mode trunk
-switchport trunk allowed vlan 30,40
+switchport trunk allowed vlan 31,41
 no shutdown
 exit
 
@@ -282,7 +282,7 @@ write memory
 
 ### 6.2 Configuración de VLANs en Multilayer Switch2 (Data Center)
 
-El Multilaer Switch2 actúa como switch de distrbición del Data Center. Debe tener las VLANs 30 y 40 creadas, y sus interfaces hacia los router configruadas como trunk. Además, se le habilita el enrutamiento IP (ip routing) para que pueda funcionar como dispositivo de capa 3.
+El Multilaer Switch2 actúa como switch de distrbición del Data Center. Debe tener las VLANs 31 y 41 creadas, y sus interfaces hacia los router configruadas como trunk. Además, se le habilita el enrutamiento IP (ip routing) para que pueda funcionar como dispositivo de capa 3.
 
 ```bash
 enable
@@ -291,43 +291,37 @@ configure terminal
 # Habilitar enrutamiento IP en el multilayer switch
 ip routing
 
-# Crear VLAN 30
-vlan 30
+# Crear VLAN 31
+vlan 31
 name WEB_SERVERS
 exit
 
-# Crear VLAN 40
-vlan 40
+# Crear VLAN 41
+vlan 41
 name DHCP_SERVERS
 exit
 
 # Configurar Gi0/1 como routed port hacia Router2
 interface GigabitEthernet0/1
 no switchport
-ip address 10.2.0.2 255.255.255.252
+ip address 10.2.1.2 255.255.255.252
 no shutdown
 exit
 
 # Configurar Gi0/2 como routed port hacia Router3
 interface GigabitEthernet0/2
 no switchport
-ip address 10.2.0.6 255.255.255.252
+ip address 10.2.1.6 255.255.255.252
 no shutdown
 exit
 
-# Agregar VLANs 10 y 20 para transporte por Port-Channel
-vlan 10
+# Agregar VLANs 11 y 21 para transporte por Port-Channel
+vlan 11
 name ADMIN
 exit
 
-vlan 20
+vlan 21
 name ESTUDIANTES
-exit
-
-# Crear SVI VLAN 10 para enlace OSPF con Multilayer Switch4
-interface vlan 10
-ip address 10.2.0.17 255.255.255.252
-no shutdown
 exit
 
 # Guardar configuración
@@ -337,34 +331,34 @@ write memory
 
 ### 6.3 Configuración de VLANs en Switch0 (Piso 1)
 
-Switch0 es el switch de acceso del Piso 1. Conecta directamente a PC1 (VLAN 10 - ADMIN) y a Laptop1 (VLAN 20 - ESTUDIANTES). Sus puertos hacia los routers se configuran como trunk.
+Switch0 es el switch de acceso del Piso 1. Conecta directamente a PC1 (VLAN 11 - ADMIN) y a Laptop1 (VLAN 21 - ESTUDIANTES). Sus puertos hacia los routers se configuran como trunk.
 
 ```bash
 enable
 configure terminal
 
-# Crear VLAN 10
-vlan 10
+# Crear VLAN 11
+vlan 11
 name ADMIN
 exit
 
-# Crear VLAN 20
-vlan 20
+# Crear VLAN 21
+vlan 21
 name ESTUDIANTES
 exit
 
-# Asignar puerto de acceso a Laptop1 — VLAN 10 ADMIN (FastEthernet0/23)
+# Asignar puerto de acceso a Laptop1 — VLAN 11 ADMIN (FastEthernet0/23)
 interface FastEthernet0/23
 switchport mode access
-switchport access vlan 10
+switchport access vlan 11
 spanning-tree portfast
 no shutdown
 exit
 
-# Asignar puerto de acceso a PC1 — VLAN 20 ESTUDIANTES (FastEthernet0/24)
+# Asignar puerto de acceso a PC1 — VLAN 21 ESTUDIANTES (FastEthernet0/24)
 interface FastEthernet0/24
 switchport mode access
-switchport access vlan 20
+switchport access vlan 21
 spanning-tree portfast
 no shutdown
 exit
@@ -372,14 +366,14 @@ exit
 # Configurar puerto trunk hacia Router1 (GigabitEthernet0/1)
 interface GigabitEthernet0/1
 switchport mode trunk
-switchport trunk allowed vlan 10,20
+switchport trunk allowed vlan 11,21
 no shutdown
 exit
 
 # Configurar puerto trunk hacia Router0 (GigabitEthernet0/2)
 interface GigabitEthernet0/2
 switchport mode trunk
-switchport trunk allowed vlan 10,20
+switchport trunk allowed vlan 11,21
 no shutdown
 exit
 
@@ -393,6 +387,7 @@ write memory
 El Multilayer Switch4 es el switch de distribución del Piso 1 y el núcleo de interconexión de toda la red. Debe conocer todas las VLANs de la red y manejar los EtherChannels LACP hacia los tres edificios. Se habilita `ip routing` para enrutamiento entre VLANs.
 
 ```bash
+# Acceder al modo de configuración
 enable
 configure terminal
 
@@ -400,33 +395,33 @@ configure terminal
 ip routing
 
 # Crear todas las VLANs conocidas
-vlan 10
+vlan 11
 name ADMIN
 exit
 
-vlan 20
+vlan 21
 name ESTUDIANTES
 exit
 
-vlan 30
+vlan 31
 name WEB_SERVERS
 exit
 
-vlan 40
+vlan 41
 name DHCP_SERVERS
 exit
 
 # Configurar Gi0/1 como routed port hacia Router1
 interface GigabitEthernet0/1
 no switchport
-ip address 10.2.1.1 255.255.255.252
+ip address 10.2.1.9 255.255.255.252
 no shutdown
 exit
 
 # Configurar Gi0/2 como routed port hacia Router0
 interface GigabitEthernet0/2
 no switchport
-ip address 10.2.1.5 255.255.255.252
+ip address 10.2.1.13 255.255.255.252
 no shutdown
 exit
 
@@ -449,11 +444,11 @@ configure terminal
 ip routing
 
 # Crear VLANs relevantes para el piso 2
-vlan 10
+vlan 11
 name ADMIN
 exit
 
-vlan 20
+vlan 21
 name ESTUDIANTES
 exit
 
@@ -488,11 +483,11 @@ configure terminal
 ip routing
 
 # Crear VLANs relevantes para el piso 3
-vlan 10
+vlan 11
 name ADMIN
 exit
 
-vlan 20
+vlan 21
 name ESTUDIANTES
 exit
 
@@ -549,7 +544,7 @@ show ip interface brief
 
 El protocolo DHCP (Dynamic Host Configuration Protocol) es un servicio de red que asigna automáticamente direcciones IP y parámetros de configuración (máscara de subred, gateway predeterminado y servidor DNS) a los dispositivos finales de la red. Esto elimina la necesidad de configurar manualmente cada host, facilitando la administración y escalabilidad de la red.
 
-En esta práctica, el **ServerDHCP** ubicado en el Data Center es el servidor centralizado encargado de entregar direccionamiento dinámico a todos los dispositivos de la red cableada del Piso 1 (VLAN 10 y VLAN 20). Dado que las solicitudes DHCP son mensajes broadcast y estos no atraviesan routers por defecto, se configura el comando `ip helper-address` en las subinterfaces de Router0 y Router1 para reenviar dichas solicitudes como unicast hacia el ServerDHCP.
+En esta práctica, el **ServerDHCP** ubicado en el Data Center es el servidor centralizado encargado de entregar direccionamiento dinámico a todos los dispositivos de la red cableada del Piso 1 (VLAN 11 y VLAN 21). Dado que las solicitudes DHCP son mensajes broadcast y estos no atraviesan routers por defecto, se configura el comando `ip helper-address` en las subinterfaces de Router0 y Router1 para reenviar dichas solicitudes como unicast hacia el ServerDHCP.
 
 Los Wireless Routers de los pisos 2 y 3 actúan como servidores DHCP locales para sus propias redes inalámbricas, por lo que se configuran de forma independiente y se documentan en la **Sección 8 — Configuración Inalámbrica**.
 
@@ -571,7 +566,7 @@ El ServerWeb requiere una dirección IP estática ya que es el servidor DNS y HT
 
 > **Nota:** El DNS Server apunta a `127.0.0.1` (loopback) porque el propio ServerWeb es el servidor DNS. Esto es necesario para que Packet Tracer active correctamente el servicio DNS en el servidor.
 
-> **Nota sobre el Default Gateway:** El gateway `192.198.100.1` es la **IP virtual HSRP** de la VLAN 30, configurada en la Sección 12. Mientras HSRP no esté configurado, se puede usar temporalmente `192.198.100.3` (IP real de Router2) para pruebas de conectividad. Una vez configurado HSRP, se debe restaurar a `192.198.100.1`.
+> **Nota sobre el Default Gateway:** El gateway `192.198.100.1` es la **IP virtual HSRP** de la VLAN 31, configurada en la Sección 12. Mientras HSRP no esté configurado, se puede usar temporalmente `192.198.100.3` (IP real de Router2) para pruebas de conectividad. Una vez configurado HSRP, se debe restaurar a `192.198.100.1`.
 
 ### 7.2 Configuración de IP estática en ServerDHCP
 
@@ -601,33 +596,33 @@ El ServerDHCP debe tener un pool configurado por cada VLAN que requiere direccio
 2. Activar el servicio con el botón **On**
 3. Crear cada pool con los siguientes valores:
 
-**Pool 1 — VLAN 10 (ADMIN)**
+**Pool 1 — VLAN 11 (ADMIN)**
 
 | Parámetro        | Valor             |
 | ---------------- | ----------------- |
 | Pool Name        | `POOL_ADMIN`      |
-| Default Gateway  | `192.198.10.65`   |
+| Default Gateway  | `192.198.11.65`   |
 | DNS Server       | `192.198.100.2`   |
-| Start IP Address | `192.198.10.65`   |
+| Start IP Address | `192.198.11.65`   |
 | Subnet Mask      | `255.255.255.240` |
 | Max Users        | `14`              |
 
-> **Nota:** El Default Gateway `192.198.10.65` es la **IP virtual HSRP** de la VLAN 10, que corresponde a la primera dirección usable de la subred `192.198.10.64/28`.
+> **Nota:** El Default Gateway `192.198.11.65` es la **IP virtual HSRP** de la VLAN 11, que corresponde a la primera dirección usable de la subred `192.198.11.64/28`.
 
-**Pool 2 — VLAN 20 (ESTUDIANTES)**
+**Pool 2 — VLAN 21 (ESTUDIANTES)**
 
 | Parámetro        | Valor              |
 | ---------------- | ------------------ |
 | Pool Name        | `POOL_ESTUDIANTES` |
-| Default Gateway  | `192.198.10.1`     |
+| Default Gateway  | `192.198.11.1`     |
 | DNS Server       | `192.198.100.2`    |
-| Start IP Address | `192.198.10.1`     |
+| Start IP Address | `192.198.11.1`     |
 | Subnet Mask      | `255.255.255.192`  |
 | Max Users        | `62`               |
 
-> **Nota:** El Default Gateway `192.198.10.1` es la **IP virtual HSRP** de la VLAN 20, que corresponde a la primera dirección usable de la subred `192.198.10.0/26`.
+> **Nota:** El Default Gateway `192.198.11.1` es la **IP virtual HSRP** de la VLAN 21, que corresponde a la primera dirección usable de la subred `192.198.11.0/26`.
 
-**Pool 3 — VLAN 30 (WEB_SERVERS)**
+**Pool 3 — VLAN 31 (WEB_SERVERS)**
 
 | Parámetro        | Valor              |
 | ---------------- | ------------------ |
@@ -638,7 +633,7 @@ El ServerDHCP debe tener un pool configurado por cada VLAN que requiere direccio
 | Subnet Mask      | `255.255.255.128`  |
 | Max Users        | `126`              |
 
-**Pool 4 — VLAN 40 (DHCP_SERVERS)**
+**Pool 4 — VLAN 41 (DHCP_SERVERS)**
 
 | Parámetro        | Valor               |
 | ---------------- | ------------------- |
@@ -649,7 +644,7 @@ El ServerDHCP debe tener un pool configurado por cada VLAN que requiere direccio
 | Subnet Mask      | `255.255.255.128`   |
 | Max Users        | `126`               |
 
-> **Nota:** Los pools de VLAN 30 y 40 se crean como respaldo, pero los servidores (ServerWeb y ServerDHCP) tienen IP estática, por lo que no solicitarán IP dinámica. El pool existe para cualquier dispositivo adicional que se agregue a esas VLANs en el futuro.
+> **Nota:** Los pools de VLAN 31 y 41 se crean como respaldo, pero los servidores (ServerWeb y ServerDHCP) tienen IP estática, por lo que no solicitarán IP dinámica. El pool existe para cualquier dispositivo adicional que se agregue a esas VLANs en el futuro.
 
 ### 7.4 Configuración de subinterfaces en Router2 (Data Center — HSRP Activo)
 
@@ -664,7 +659,7 @@ configure terminal
 
 # Activar interfaz física hacia Multilayer Switch2
 interface GigabitEthernet0/0
-ip address 10.2.0.1 255.255.255.252
+ip address 10.2.1.1 255.255.255.252
 no shutdown
 exit
 
@@ -673,16 +668,16 @@ interface GigabitEthernet0/1
 no shutdown
 exit
 
-# Subinterfaz para VLAN 30 - WEB_SERVERS
-interface GigabitEthernet0/1.30
-encapsulation dot1Q 30
+# Subinterfaz para VLAN 31 - WEB_SERVERS
+interface GigabitEthernet0/1.31
+encapsulation dot1Q 31
 ip address 192.198.100.3 255.255.255.128
 no shutdown
 exit
 
-# Subinterfaz para VLAN 40 - DHCP_SERVERS
-interface GigabitEthernet0/1.40
-encapsulation dot1Q 40
+# Subinterfaz para VLAN 41 - DHCP_SERVERS
+interface GigabitEthernet0/1.41
+encapsulation dot1Q 41
 ip address 192.198.100.131 255.255.255.128
 no shutdown
 exit
@@ -704,7 +699,7 @@ configure terminal
 
 # Activar interfaz física hacia Multilayer Switch2
 interface GigabitEthernet0/0
-ip address 10.2.0.5 255.255.255.252
+ip address 10.2.1.5 255.255.255.252
 no shutdown
 exit
 
@@ -713,16 +708,16 @@ interface GigabitEthernet0/1
 no shutdown
 exit
 
-# Subinterfaz para VLAN 30 - WEB_SERVERS
-interface GigabitEthernet0/1.30
-encapsulation dot1Q 30
+# Subinterfaz para VLAN 31 - WEB_SERVERS
+interface GigabitEthernet0/1.31
+encapsulation dot1Q 31
 ip address 192.198.100.4 255.255.255.128
 no shutdown
 exit
 
-# Subinterfaz para VLAN 40 - DHCP_SERVERS
-interface GigabitEthernet0/1.40
-encapsulation dot1Q 40
+# Subinterfaz para VLAN 41 - DHCP_SERVERS
+interface GigabitEthernet0/1.41
+encapsulation dot1Q 41
 ip address 192.198.100.132 255.255.255.128
 no shutdown
 exit
@@ -731,14 +726,14 @@ end
 write memory
 ```
 
-### 7.6 Configuración de subinterfaces en Router1 (Piso 1 — HSRP Activo VLAN 10)
+### 7.6 Configuración de subinterfaces en Router1 (Piso 1 — HSRP Activo VLAN 11)
 
 Router1 tiene dos interfaces físicas con roles distintos:
 
-- `GigabitEthernet0/0` → conectado a **Multilayer Switch4** (enlace de enrutamiento, 10.2.1.0/30)
+- `GigabitEthernet0/0` → conectado a **Multilayer Switch4** (enlace de enrutamiento, 10.2.1.8/30)
 - `GigabitEthernet0/1` → conectado a **Switch0** (subinterfaces hacia los PCs)
 
-Router1 es el **router activo** para VLAN 10 (prioridad 110) y el **standby** para VLAN 20 (prioridad 90). Esto implementa **load balancing**: cada VLAN tiene un router activo distinto.
+Router1 es el **router activo** para VLAN 11 (prioridad 110) y el **standby** para VLAN 21 (prioridad 90). Esto implementa **load balancing**: cada VLAN tiene un router activo distinto.
 
 ```bash
 enable
@@ -747,7 +742,7 @@ no ip domain-lookup
 
 # Activar interfaz física hacia Multilayer Switch4
 interface GigabitEthernet0/0
-ip address 10.2.1.2 255.255.255.252
+ip address 10.2.1.10 255.255.255.252
 no shutdown
 exit
 
@@ -756,26 +751,26 @@ interface GigabitEthernet0/1
 no shutdown
 exit
 
-# Subinterfaz para VLAN 10 - ADMIN
-# Router1 es ACTIVO para VLAN 10 (prioridad 110)
-interface GigabitEthernet0/1.10
-encapsulation dot1Q 10
-ip address 192.198.10.66 255.255.255.240
-standby 10 ip 192.198.10.65
-standby 10 priority 110
-standby 10 preempt
+# Subinterfaz para VLAN 11 - ADMIN
+# Router1 es ACTIVO para VLAN 11 (prioridad 110)
+interface GigabitEthernet0/1.11
+encapsulation dot1Q 11
+ip address 192.198.11.66 255.255.255.240
+standby 11 ip 192.198.11.65
+standby 11 priority 110
+standby 11 preempt
 ip helper-address 192.198.100.130
 no shutdown
 exit
 
-# Subinterfaz para VLAN 20 - ESTUDIANTES
-# Router1 es STANDBY para VLAN 20 (prioridad 90)
-interface GigabitEthernet0/1.20
-encapsulation dot1Q 20
-ip address 192.198.10.3 255.255.255.192
-standby 20 ip 192.198.10.1
-standby 20 priority 90
-standby 20 preempt
+# Subinterfaz para VLAN 21 - ESTUDIANTES
+# Router1 es STANDBY para VLAN 21 (prioridad 90)
+interface GigabitEthernet0/1.21
+encapsulation dot1Q 21
+ip address 192.198.11.3 255.255.255.192
+standby 21 ip 192.198.11.1
+standby 21 priority 90
+standby 21 preempt
 ip helper-address 192.198.100.130
 no shutdown
 exit
@@ -784,14 +779,14 @@ end
 write memory
 ```
 
-### 7.7 Configuración de subinterfaces en Router0 (Piso 1 — HSRP Activo VLAN 20)
+### 7.7 Configuración de subinterfaces en Router0 (Piso 1 — HSRP Activo VLAN 21)
 
-Router0 es el router activo para VLAN 20 y standby para VLAN 10 en el Piso 1:
+Router0 es el router activo para VLAN 21 y standby para VLAN 11 en el Piso 1:
 
-- `GigabitEthernet0/0` → conectado a **Multilayer Switch4** (enlace de enrutamiento, 10.2.1.4/30)
+- `GigabitEthernet0/0` → conectado a **Multilayer Switch4** (enlace de enrutamiento, 10.2.1.12/30)
 - `GigabitEthernet0/1` → conectado a **Switch0** (subinterfaces hacia los PCs)
 
-Router0 es el **router activo** para VLAN 20 (prioridad 110) y el **standby** para VLAN 10 (prioridad 90).
+Router0 es el **router activo** para VLAN 21 (prioridad 110) y el **standby** para VLAN 11 (prioridad 90).
 
 ```bash
 enable
@@ -800,7 +795,7 @@ no ip domain-lookup
 
 # Activar interfaz física hacia Multilayer Switch4
 interface GigabitEthernet0/0
-ip address 10.2.1.6 255.255.255.252
+ip address 10.2.1.14 255.255.255.252
 no shutdown
 exit
 
@@ -809,26 +804,26 @@ interface GigabitEthernet0/1
 no shutdown
 exit
 
-# Subinterfaz para VLAN 10 - ADMIN
-# Router0 es STANDBY para VLAN 10 (prioridad 90)
-interface GigabitEthernet0/1.10
-encapsulation dot1Q 10
-ip address 192.198.10.67 255.255.255.240
-standby 10 ip 192.198.10.65
-standby 10 priority 90
-standby 10 preempt
+# Subinterfaz para VLAN 11 - ADMIN
+# Router0 es STANDBY para VLAN 11 (prioridad 90)
+interface GigabitEthernet0/1.11
+encapsulation dot1Q 11
+ip address 192.198.11.67 255.255.255.240
+standby 11 ip 192.198.11.65
+standby 11 priority 90
+standby 11 preempt
 ip helper-address 192.198.100.130
 no shutdown
 exit
 
-# Subinterfaz para VLAN 20 - ESTUDIANTES
-# Router0 es ACTIVO para VLAN 20 (prioridad 110)
-interface GigabitEthernet0/1.20
-encapsulation dot1Q 20
-ip address 192.198.10.2 255.255.255.192
-standby 20 ip 192.198.10.1
-standby 20 priority 110
-standby 20 preempt
+# Subinterfaz para VLAN 21 - ESTUDIANTES
+# Router0 es ACTIVO para VLAN 21 (prioridad 110)
+interface GigabitEthernet0/1.21
+encapsulation dot1Q 21
+ip address 192.198.11.2 255.255.255.192
+standby 21 ip 192.198.11.1
+standby 21 priority 110
+standby 21 preempt
 ip helper-address 192.198.100.130
 no shutdown
 exit
@@ -843,12 +838,12 @@ Una vez configurados todos los dispositivos, se puede verificar el correcto func
 
 ```bash
 # En Router1 o Router0 — verificar que el helper-address está activo
-show ip interface GigabitEthernet0/1.10
-show ip interface GigabitEthernet0/1.20
+show ip interface GigabitEthernet0/1.11
+show ip interface GigabitEthernet0/1.21
 
 # En Router2 o Router3 — verificar subinterfaces del Data Center
-show ip interface GigabitEthernet0/1.30
-show ip interface GigabitEthernet0/1.40
+show ip interface GigabitEthernet0/1.31
+show ip interface GigabitEthernet0/1.41
 
 # En cualquier router — verificar todas las interfaces configuradas
 show ip interface brief
@@ -872,108 +867,108 @@ A diferencia de la red cableada que recibe sus direcciones IP del servidor centr
 
 Las configuraciones de seguridad y de red varían dependiendo del piso, siguiendo los lineamientos establecidos para la práctica:
 
-| Parámetro             | Piso 2         | Piso 3         |
-|-----------------------|----------------|----------------|
-| SSID (Router 1)       | PISO2_G0_R1    | PISO3_G0_R1    |
-| SSID (Router 2)       | PISO2_G0_R2    | PISO3_G0_R3    |
+| Parámetro             | Piso 2             | Piso 3          |
+| --------------------- | ------------------ | --------------- |
+| SSID (Router 1)       | PISO2_G1_R1        | PISO3_G1_R1     |
+| SSID (Router 2)       | PISO2_G1_R2        | PISO3_G1_R3     |
 | Broadcast SSID        | Deshabilitado (No) | Habilitado (Sí) |
-| Seguridad             | WPA2 Personal  | WPA2 Personal  |
-| Contraseña de Red     | G0_PISO2       | G0_PISO3       |
-| Contraseña del Router | Grupo0_P2      | Grupo0_P3      |
+| Seguridad             | WPA2 Personal      | WPA2 Personal   |
+| Contraseña de Red     | G1_PISO2           | G1_PISO3        |
+| Contraseña del Router | Grupo1_P2          | Grupo1_P3       |
 
 ###  Configuración de Routers Inalámbricos — Piso 2
 
-El Piso 2 utiliza la red general `192.198.20.0/24`, dividida en dos subredes `/25` mediante FLSM para soportar 80 hosts por WLAN.
+El Piso 2 utiliza la red general `192.198.21.0/24`, dividida en dos subredes `/25` mediante FLSM para soportar 80 hosts por WLAN.
 
 Toda la configuración de estos dispositivos se realiza a través de su interfaz gráfica (GUI) en la pestaña GUI de Packet Tracer.
 
 #### Wireless Router0 (WLAN 1)
 
 **Configuración LAN / DHCP** *(Setup → Basic Setup)*
-- IP Address: `192.198.20.1`
+- IP Address: `192.198.21.1`
 - Subnet Mask: `255.255.255.128`
 - DHCP Server: `Enable`
-- Start IP Address: `192.198.20.2`
+- Start IP Address: `192.198.21.2`
 - Maximum Number of Users: `80`
 
 **Configuración WiFi** *(Wireless → Basic Wireless Settings)*
-- Network Name (SSID): `PISO2_G0_R1`
+- Network Name (SSID): `PISO2_G1_R1`
 - SSID Broadcast: `Disabled`
 
 **Seguridad WiFi** *(Wireless → Wireless Security)*
 - Security Mode: `WPA2 Personal`
 - Encryption: `AES`
-- Passphrase: `G0_PISO2`
+- Passphrase: `G1_PISO2`
 
 **Contraseña de Administración** *(Administration → Management)*
-- Router Password: `Grupo0_P2`
+- Router Password: `Grupo1_P2`
 
 #### Wireless Router1 (WLAN 2)
 
 **Configuración LAN / DHCP** *(Setup → Basic Setup)*
-- IP Address: `192.198.20.129`
+- IP Address: `192.198.21.129`
 - Subnet Mask: `255.255.255.128`
 - DHCP Server: `Enable`
-- Start IP Address: `192.198.20.130`
+- Start IP Address: `192.198.21.130`
 - Maximum Number of Users: `80`
 
 **Configuración WiFi** *(Wireless → Basic Wireless Settings)*
-- Network Name (SSID): `PISO2_G0_R2`
+- Network Name (SSID): `PISO2_G1_R2`
 - SSID Broadcast: `Disabled`
 
 **Seguridad WiFi** *(Wireless → Wireless Security)*
 - Security Mode: `WPA2 Personal`
 - Encryption: `AES`
-- Passphrase: `G0_PISO2`
+- Passphrase: `G1_PISO2`
 
 **Contraseña de Administración** *(Administration → Management)*
-- Router Password: `Grupo0_P2`
+- Router Password: `Grupo1_P2`
 
 ###  Configuración de Routers Inalámbricos — Piso 3
 
-El Piso 3 utiliza la red general `192.198.30.0/24`, dividida equitativamente en dos subredes `/25` para soportar la demanda de 80 hosts por WLAN. A diferencia del piso 2, en este piso el Broadcast SSID se encuentra visible.
+El Piso 3 utiliza la red general `192.198.31.0/24`, dividida equitativamente en dos subredes `/25` para soportar la demanda de 80 hosts por WLAN. A diferencia del piso 2, en este piso el Broadcast SSID se encuentra visible.
 
 #### Wireless Router2 (WLAN 1)
 
 **Configuración LAN / DHCP** *(Setup → Basic Setup)*
-- IP Address: `192.198.30.1`
+- IP Address: `192.198.31.1`
 - Subnet Mask: `255.255.255.128`
 - DHCP Server: `Enable`
-- Start IP Address: `192.198.30.2`
+- Start IP Address: `192.198.31.2`
 - Maximum Number of Users: `80`
 
 **Configuración WiFi** *(Wireless → Basic Wireless Settings)*
-- Network Name (SSID): `PISO3_G0_R1`
+- Network Name (SSID): `PISO3_G1_R1`
 - SSID Broadcast: `Enabled`
 
 **Seguridad WiFi** *(Wireless → Wireless Security)*
 - Security Mode: `WPA2 Personal`
 - Encryption: `AES`
-- Passphrase: `G0_PISO3`
+- Passphrase: `G1_PISO3`
 
 **Contraseña de Administración** *(Administration → Management)*
-- Router Password: `Grupo0_P3`
+- Router Password: `Grupo1_P3`
 
 #### Wireless Router0(1) (WLAN 2)
 
 **Configuración LAN / DHCP** *(Setup → Basic Setup)*
-- IP Address: `192.198.30.129`
+- IP Address: `192.198.31.129`
 - Subnet Mask: `255.255.255.128`
 - DHCP Server: `Enable`
-- Start IP Address: `192.198.30.130`
+- Start IP Address: `192.198.31.130`
 - Maximum Number of Users: `80`
 
 **Configuración WiFi** *(Wireless → Basic Wireless Settings)*
-- Network Name (SSID): `PISO3_G0_R3`
+- Network Name (SSID): `PISO3_G1_R3`
 - SSID Broadcast: `Enabled`
 
 **Seguridad WiFi** *(Wireless → Wireless Security)*
 - Security Mode: `WPA2 Personal`
 - Encryption: `AES`
-- Passphrase: `G0_PISO3`
+- Passphrase: `G1_PISO3`
 
 **Contraseña de Administración** *(Administration → Management)*
-- Router Password: `Grupo0_P3`
+- Router Password: `Grupo1_P3`
 
 ###  Comandos de los Multilayer Switches (Piso 2 y Piso 3)
 
@@ -988,10 +983,10 @@ configure terminal
 ip routing
 
 # Crear VLANs
-vlan 10
+vlan 11
 name ADMIN
 exit
-vlan 20
+vlan 21
 name ESTUDIANTES
 exit
 
@@ -1017,7 +1012,7 @@ exit
 interface Port-channel2
 switchport trunk encapsulation dot1q
 switchport mode trunk
-switchport trunk allowed vlan 10,20,30,40
+switchport trunk allowed vlan 11,21,31,41
 no shutdown
 exit
 
@@ -1034,10 +1029,10 @@ configure terminal
 ip routing
 
 # Crear VLANs
-vlan 10
+vlan 11
 name ADMIN
 exit
-vlan 20
+vlan 21
 name ESTUDIANTES
 exit
 
@@ -1063,7 +1058,7 @@ exit
 interface Port-channel3
 switchport trunk encapsulation dot1q
 switchport mode trunk
-switchport trunk allowed vlan 10,20,30,40
+switchport trunk allowed vlan 11,21,31,41
 no shutdown
 exit
 
@@ -1073,11 +1068,11 @@ write memory
 
 ## 9. Configuración DNS y Servidor Web
 
-El **DNS (Domain Name System)** es un servicio de red que traduce nombres de dominio legibles por humanos (como `www.practica2_Grupo0.com`) en direcciones IP que los dispositivos de red pueden utilizar para establecer comunicaciones. Sin DNS, los usuarios tendrían que recordar la dirección IP numérica de cada servicio al que deseen acceder.
+El **DNS (Domain Name System)** es un servicio de red que traduce nombres de dominio legibles por humanos (como `www.practica2_Grupo1.com`) en direcciones IP que los dispositivos de red pueden utilizar para establecer comunicaciones. Sin DNS, los usuarios tendrían que recordar la dirección IP numérica de cada servicio al que deseen acceder.
 
 El **servidor HTTP (HyperText Transfer Protocol)** es el servicio encargado de alojar y servir páginas web estáticas o dinámicas a los clientes que las soliciten a través de un navegador web. En esta práctica, el ServerWeb cumple ambos roles simultáneamente: es el servidor DNS de toda la red y el servidor HTTP que aloja la página web del grupo.
 
-El dominio configurado para esta práctica es: **`www.practica2_Grupo0.com`**
+El dominio configurado para esta práctica es: **`www.practica2_Grupo1.com`**
 
 Cuando cualquier dispositivo de la red ingrese este dominio en su navegador, el ServerWeb primero resolverá el nombre a la IP `192.198.100.2` mediante DNS, y luego servirá la página web estática mediante HTTP.
 
@@ -1100,7 +1095,7 @@ El servicio DNS necesita tener al menos dos tipos de registros configurados:
 
 | Campo   | Valor                      |
 | ------- | -------------------------- |
-| Name    | `www.practica2_Grupo0.com` |
+| Name    | `www.practica2_Grupo1.com` |
 | Type    | `A Record`                 |
 | Address | `192.198.100.2`            |
 
@@ -1108,7 +1103,7 @@ El servicio DNS necesita tener al menos dos tipos de registros configurados:
 
 | Campo   | Valor                  |
 | ------- | ---------------------- |
-| Name    | `practica2_Grupo0.com` |
+| Name    | `practica2_Grupo1.com` |
 | Type    | `A Record`             |
 | Address | `192.198.100.2`        |
 
@@ -1116,9 +1111,9 @@ El servicio DNS necesita tener al menos dos tipos de registros configurados:
 
 | Campo       | Valor                      |
 | ----------- | -------------------------- |
-| Name        | `practica2_Grupo0.com`     |
+| Name        | `practica2_Grupo1.com`     |
 | Type        | `NS`                       |
-| Server Name | `www.practica2_Grupo0.com` |
+| Server Name | `www.practica2_Grupo1.com` |
 
 ### 9.2 Configuración del Servicio HTTP en ServerWeb
 
@@ -1240,12 +1235,12 @@ Para verificar que el DNS está resolviendo correctamente el dominio, se puede u
 # Desde el Command Prompt de cualquier PC cliente en Packet Tracer
 
 # Verificar resolución DNS del dominio
-nslookup www.practica2_Grupo0.com
+nslookup www.practica2_Grupo1.com
 
 # Resultado esperado:
 # Server:  [192.198.100.2]
 # Address: 192.198.100.2
-# Name:    www.practica2_Grupo0.com
+# Name:    www.practica2_Grupo1.com
 # Address: 192.198.100.2
 ```
 
@@ -1254,7 +1249,7 @@ nslookup www.practica2_Grupo0.com
 Para verificar que la página web se despliega correctamente:
 
 1. En cualquier PC cliente de la red en Packet Tracer → pestaña **Desktop** → **Web Browser**
-2. En la barra de direcciones ingresar: `www.practica2_Grupo0.com`
+2. En la barra de direcciones ingresar: `www.practica2_Grupo1.com`
 3. La página debe cargar mostrando los datos del grupo
 
 También se puede acceder directamente por IP para verificar que HTTP funciona independientemente del DNS:
@@ -1282,16 +1277,16 @@ Router2/3 (Gi0/0) ↔ MS2 (Gi0/1 y Gi0/2)
                 MS4 (Gi0/1 y Gi0/2) ↔ Router0/1
 ```
 
-Los Multilayer Switches transportan tráfico en **capa 2** a través del Port-Channel. Para que OSPF funcione entre MS2 y MS4, se utiliza una **SVI en VLAN 10** como medio de transporte IP entre ambos switches.
+Los Multilayer Switches transportan tráfico en **capa 2** a través del Port-Channel. Para que OSPF funcione entre MS2 y MS4, se utiliza una **SVI en VLAN 11** como medio de transporte IP entre ambos switches.
 
-| Dispositivo | Router ID   | Redes anunciadas                                                              |
-| ----------- | ----------- | ----------------------------------------------------------------------------- |
-| Router2     | 2.2.2.2     | 10.2.0.0/30, 192.198.100.0/25, 192.198.100.128/25                            |
-| Router3     | 3.3.3.3     | 10.2.0.4/30, 192.198.100.0/25, 192.198.100.128/25                            |
-| MS2         | 22.22.22.22 | 10.2.0.0/30, 10.2.0.4/30, 10.2.1.16/30                                       |
-| MS4         | 44.44.44.44 | 10.2.1.0/30, 10.2.1.4/30, 10.2.1.8/30, 10.2.1.12/30, 10.2.1.16/30          |
-| Router1     | 1.1.1.1     | 10.2.1.0/30, 192.198.10.64/28, 192.198.10.0/26                               |
-| Router0     | 2.2.2.2     | 10.2.1.4/30, 192.198.10.64/28, 192.198.10.0/26                               |
+| Dispositivo | Router ID   | Redes anunciadas                                                    |
+| ----------- | ----------- | ------------------------------------------------------------------- |
+| Router2     | 2.2.2.2     | 10.2.1.0/30, 192.198.100.0/25, 192.198.100.128/25                   |
+| Router3     | 3.3.3.3     | 10.2.1.4/30, 192.198.100.0/25, 192.198.100.128/25                   |
+| MS2         | 22.22.22.22 | 10.2.1.0/30, 10.2.1.4/30, 10.2.1.24/30                              |
+| MS4         | 44.44.44.44 | 10.2.1.8/30, 10.2.1.12/30, 10.2.1.16/30, 10.2.1.20/30, 10.2.1.24/30 |
+| Router1     | 1.1.1.1     | 10.2.1.8/30, 192.198.11.64/28, 192.198.11.0/26                      |
+| Router0     | 2.2.2.2     | 10.2.1.12/30, 192.198.11.64/28, 192.198.11.0/26                     |
 
 ### 10.2 Configuración OSPF en Router2 (Data Center)
 
@@ -1301,11 +1296,11 @@ configure terminal
 
 router ospf 1
 router-id 2.2.2.2
-network 10.2.0.0 0.0.0.3 area 0
+network 10.2.1.0 0.0.0.3 area 0
 network 192.198.100.0 0.0.0.127 area 0
 network 192.198.100.128 0.0.0.127 area 0
-passive-interface GigabitEthernet0/1.30
-passive-interface GigabitEthernet0/1.40
+passive-interface GigabitEthernet0/1.31
+passive-interface GigabitEthernet0/1.41
 exit
 
 end
@@ -1320,11 +1315,11 @@ configure terminal
 
 router ospf 1
 router-id 3.3.3.3
-network 10.2.0.4 0.0.0.3 area 0
+network 10.2.1.4 0.0.0.3 area 0
 network 192.198.100.0 0.0.0.127 area 0
 network 192.198.100.128 0.0.0.127 area 0
-passive-interface GigabitEthernet0/1.30
-passive-interface GigabitEthernet0/1.40
+passive-interface GigabitEthernet0/1.31
+passive-interface GigabitEthernet0/1.41
 exit
 
 end
@@ -1333,7 +1328,7 @@ write memory
 
 ### 10.4 Configuración OSPF en Multilayer Switch2 (Data Center)
 
-MS2 participa en OSPF a través de sus routed ports (`Gi0/1` hacia Router2 y `Gi0/2` hacia Router3) y su SVI VLAN 10 (`10.2.0.17`) hacia MS4.
+MS2 participa en OSPF a través de sus routed ports (`Gi0/1` hacia Router2 y `Gi0/2` hacia Router3) y su SVI VLAN 11 (`10.2.1.26`) hacia MS4.
 
 ```bash
 enable
@@ -1341,9 +1336,9 @@ configure terminal
 
 router ospf 1
 router-id 22.22.22.22
-network 10.2.0.0 0.0.0.3 area 0
-network 10.2.0.4 0.0.0.3 area 0
-network 10.2.0.16 0.0.0.3 area 0
+network 10.2.1.0 0.0.0.3 area 0
+network 10.2.1.4 0.0.0.3 area 0
+network 10.2.1.24 0.0.0.3 area 0
 network 192.198.100.0 0.0.0.127 area 0
 network 192.198.100.128 0.0.0.127 area 0
 exit
@@ -1362,11 +1357,11 @@ configure terminal
 
 router ospf 1
 router-id 44.44.44.44
-network 10.2.1.0 0.0.0.3 area 0
-network 10.2.1.4 0.0.0.3 area 0
 network 10.2.1.8 0.0.0.3 area 0
 network 10.2.1.12 0.0.0.3 area 0
 network 10.2.1.16 0.0.0.3 area 0
+network 10.2.1.20 0.0.0.3 area 0
+network 10.2.1.24 0.0.0.3 area 0
 exit
 
 end
@@ -1383,11 +1378,11 @@ configure terminal
 
 router ospf 1
 router-id 1.1.1.1
-network 10.2.1.0 0.0.0.3 area 0
-network 192.198.10.64 0.0.0.15 area 0
-network 192.198.10.0 0.0.0.63 area 0
-passive-interface GigabitEthernet0/1.10
-passive-interface GigabitEthernet0/1.20
+network 10.2.1.8 0.0.0.3 area 0
+network 192.198.11.64 0.0.0.15 area 0
+network 192.198.11.0 0.0.0.63 area 0
+passive-interface GigabitEthernet0/1.11
+passive-interface GigabitEthernet0/1.21
 exit
 
 end
@@ -1403,12 +1398,12 @@ enable
 configure terminal
 
 router ospf 1
-router-id 2.2.2.2
-network 10.2.1.4 0.0.0.3 area 0
-network 192.198.10.64 0.0.0.15 area 0
-network 192.198.10.0 0.0.0.63 area 0
-passive-interface GigabitEthernet0/1.10
-passive-interface GigabitEthernet0/1.20
+router-id 5.5.5.5
+network 10.2.1.12 0.0.0.3 area 0
+network 192.198.11.64 0.0.0.15 area 0
+network 192.198.11.0 0.0.0.63 area 0
+passive-interface GigabitEthernet0/1.11
+passive-interface GigabitEthernet0/1.21
 exit
 
 end
@@ -1438,19 +1433,19 @@ show ip ospf database
 
 ```
 Neighbor ID   Pri   State     Address     Interface
-2.2.2.2         1   FULL/BDR  10.2.0.1    GigabitEthernet0/1
-3.3.3.3         1   FULL/BDR  10.2.0.5    GigabitEthernet0/2
-44.44.44.44     1   FULL/DR   10.2.0.18   Vlan10
+2.2.2.2         1   FULL/BDR  10.2.1.1    GigabitEthernet0/1
+3.3.3.3         1   FULL/BDR  10.2.1.5    GigabitEthernet0/2
+44.44.44.44     1   FULL/DR   10.2.1.25   Vlan11
 ```
 
 **Resultado obtenido de `show ip ospf neighbor` en MS4:**
 
 ```
 Neighbor ID   Pri   State        Dead Time   Address      Interface
-10.2.1.10       1   FULL/BDR     00:00:30    10.2.1.10    Port-channel6
-1.1.1.1         1   FULL/DR      00:00:35    10.2.1.2     GigabitEthernet0/1
-22.22.22.22     1   FULL/BDR     00:00:33    10.2.1.18    Port-channel8
-10.2.1.14       1   FULL/BDR     00:00:37    10.2.1.14    Port-channel7
+10.2.1.18       1   FULL/BDR     00:00:30    10.2.1.18    Port-channel6
+1.1.1.1         1   FULL/DR      00:00:35    10.2.1.10     GigabitEthernet0/1
+22.22.22.22     1   FULL/BDR     00:00:33    10.2.1.26    Port-channel8
+10.2.1.22       1   FULL/BDR     00:00:37    10.2.1.22    Port-channel7
 ```
 
 > **Nota:** El balanceo de carga OSPF entre Router0 y Router1 (ambos anuncian las mismas redes) causa que algunos pings sean intermitentes al 50%. Esto se resuelve completamente con la configuración de **HSRP** en la Sección 12, que establece un único gateway activo por VLAN.
@@ -1466,11 +1461,11 @@ En esta práctica se configuran tres enlaces LACP, uno por cada conexión entre 
 
 Los EtherChannels del Piso 1 se implementan como **enlaces de capa 3** (routed ports), no como trunks de capa 2. Cada Port-Channel tiene una dirección IP asignada directamente y participa en OSPF. Esto se logra con `no switchport` antes de agregar las interfaces al canal.
 
-| Port-Channel | Enlace                  | Puertos MS4       | Puertos Dispositivo Remoto | IP MS4      | IP Remoto   |
-| ------------ | ----------------------- | ----------------- | -------------------------- | ----------- | ----------- |
-| Po6          | Piso 1 ↔ Piso 2         | `Fa0/17 - Fa0/20` | MS0 (Piso 2): `Fa0/21-24`  | 10.2.1.9/30 | 10.2.1.10/30|
-| Po7          | Piso 1 ↔ Piso 3         | `Fa0/13 - Fa0/16` | MS3 (Piso 3): `Fa0/21-24`  | 10.2.1.13/30| 10.2.1.14/30|
-| Po8          | Piso 1 ↔ Data Center    | `Fa0/21 - Fa0/24` | MS2 (DC): `Fa0/21-24`      | 10.2.1.17/30| 10.2.1.18/30|
+| Port-Channel | Enlace               | Puertos MS4       | Puertos Dispositivo Remoto | IP MS4       | IP Remoto    |
+| ------------ | -------------------- | ----------------- | -------------------------- | ------------ | ------------ |
+| Po6          | Piso 1 ↔ Piso 2      | `Fa0/17 - Fa0/20` | MS0 (Piso 2): `Fa0/21-24`  | 10.2.1.17/30 | 10.2.1.18/30 |
+| Po7          | Piso 1 ↔ Piso 3      | `Fa0/13 - Fa0/16` | MS3 (Piso 3): `Fa0/21-24`  | 10.2.1.21/30 | 10.2.1.22/30 |
+| Po8          | Piso 1 ↔ Data Center | `Fa0/21 - Fa0/24` | MS2 (DC): `Fa0/21-24`      | 10.2.1.25/30 | 10.2.1.26/30 |
 
 > **Nota importante:** En LACP, un extremo se configura como **active** (inicia la negociación) y el otro como **active** también puede funcionar, o como **passive** (solo responde). En esta práctica ambos extremos usan `mode active`.
 
@@ -1496,7 +1491,7 @@ no shutdown
 exit
 
 interface Port-channel6
-ip address 10.2.1.9 255.255.255.252
+ip address 10.2.1.17 255.255.255.252
 no shutdown
 exit
 
@@ -1511,7 +1506,7 @@ no shutdown
 exit
 
 interface Port-channel7
-ip address 10.2.1.13 255.255.255.252
+ip address 10.2.1.21 255.255.255.252
 no shutdown
 exit
 
@@ -1526,7 +1521,7 @@ no shutdown
 exit
 
 interface Port-channel8
-ip address 10.2.1.17 255.255.255.252
+ip address 10.2.1.25 255.255.255.252
 no shutdown
 exit
 
@@ -1540,17 +1535,14 @@ write memory
 enable
 configure terminal
 
-# IMPORTANTE: Primero asignar interfaces al channel-group
-# LUEGO configurar trunk en el Port-Channel (no en las interfaces físicas)
 interface range FastEthernet0/21 - 24
-no shutdown
+no switchport
 channel-group 1 mode passive
+no shutdown
 exit
 
 interface Port-channel1
-switchport trunk encapsulation dot1q
-switchport mode trunk
-switchport trunk allowed vlan 10,20,30,40
+ip address 10.2.1.26 255.255.255.252
 no shutdown
 exit
 
@@ -1575,7 +1567,7 @@ exit
 interface Port-channel2
 switchport trunk encapsulation dot1q
 switchport mode trunk
-switchport trunk allowed vlan 10,20,30,40
+switchport trunk allowed vlan 11,21,31,41
 no shutdown
 exit
 
@@ -1598,7 +1590,7 @@ exit
 interface Port-channel3
 switchport trunk encapsulation dot1q
 switchport mode trunk
-switchport trunk allowed vlan 10,20,30,40
+switchport trunk allowed vlan 11,21,31,41
 no shutdown
 exit
 
@@ -1624,9 +1616,9 @@ show etherchannel 8 detail
 show ip interface brief
 
 # Verificar conectividad con el extremo remoto
-ping 10.2.1.10
-ping 10.2.1.14
 ping 10.2.1.18
+ping 10.2.1.22
+ping 10.2.1.26
 ```
 
 - **MS2**
@@ -1651,69 +1643,69 @@ Los indicadores significan:
 
 En esta práctica, HSRP se configura en dos lugares:
 
-- **Piso 1** (secciones 12.1–12.4): Router0 y Router1, para las VLANs 10 y 20
-- **Data Center** (secciones 12.5–12.9): Router2 y Router3, para las VLANs 30 y 40
+- **Piso 1** (secciones 12.1–12.4): Router0 y Router1, para las VLANs 11 y 21
+- **Data Center** (secciones 12.5–12.9): Router2 y Router3, para las VLANs 31 y 41
 
 ## HSRP — Piso 1
 
 En el Piso 1 se implementa **HSRP con balanceo de carga**: cada router es activo para una VLAN distinta. Esto aprovecha ambos enlaces y evita que un router quede ocioso.
 
-| Router  | VLAN 10 (ADMIN) | VLAN 20 (ESTUDIANTES) |
-| ------- | --------------- | --------------------- |
-| Router1 | **Activo** (110)    | Standby (90)          |
-| Router0 | Standby (90)    | **Activo** (110)          |
+| Router  | VLAN 11 (ADMIN)  | VLAN 21 (ESTUDIANTES) |
+| ------- | ---------------- | --------------------- |
+| Router1 | **Activo** (110) | Standby (90)          |
+| Router0 | Standby (90)     | **Activo** (110)      |
 
 Las IPs virtuales HSRP del Piso 1 son:
 
-| VLAN                     | Subred            | IP Virtual HSRP  | Uso                          |
-| ------------------------ | ----------------- | ---------------- | ---------------------------- |
-| VLAN 10 — ADMIN          | 192.198.10.64/28  | `192.198.10.65`  | Gateway de dispositivos ADMIN |
-| VLAN 20 — ESTUDIANTES    | 192.198.10.0/26   | `192.198.10.1`   | Gateway de Estudiantes        |
+| VLAN                  | Subred           | IP Virtual HSRP | Uso                           |
+| --------------------- | ---------------- | --------------- | ----------------------------- |
+| VLAN 11 — ADMIN       | 192.198.11.64/28 | `192.198.11.65` | Gateway de dispositivos ADMIN |
+| VLAN 21 — ESTUDIANTES | 192.198.11.0/26  | `192.198.11.1`  | Gateway de Estudiantes        |
 
-> **Importante:** HSRP se configura en las **subinterfaces** `Gi0/1.10` y `Gi0/1.20` de cada router. Las IPs virtuales son las primeras direcciones usables de cada subred y son las que se configuran como Default Gateway en los pools DHCP y en los hosts estáticos.
+> **Importante:** HSRP se configura en las **subinterfaces** `Gi0/1.11` y `Gi0/1.21` de cada router. Las IPs virtuales son las primeras direcciones usables de cada subred y son las que se configuran como Default Gateway en los pools DHCP y en los hosts estáticos.
 
-### 12.1 Configuración HSRP en Router1 (Activo VLAN 10 / Standby VLAN 20)
+### 12.1 Configuración HSRP en Router1 (Activo VLAN 11 / Standby VLAN 21)
 
 ```bash
 enable
 configure terminal
 
-# HSRP en VLAN 10 — Router1 es ACTIVO (prioridad 110)
-interface GigabitEthernet0/1.10
-standby 10 ip 192.198.10.65
-standby 10 priority 110
-standby 10 preempt
+# HSRP en VLAN 11 — Router1 es ACTIVO (prioridad 110)
+interface GigabitEthernet0/1.11
+standby 11 ip 192.198.11.65
+standby 11 priority 110
+standby 11 preempt
 exit
 
-# HSRP en VLAN 20 — Router1 es STANDBY (prioridad 90)
-interface GigabitEthernet0/1.20
-standby 20 ip 192.198.10.1
-standby 20 priority 90
-standby 20 preempt
+# HSRP en VLAN 21 — Router1 es STANDBY (prioridad 90)
+interface GigabitEthernet0/1.21
+standby 21 ip 192.198.11.1
+standby 21 priority 90
+standby 21 preempt
 exit
 
 end
 write memory
 ```
 
-### 12.2 Configuración HSRP en Router0 (Standby VLAN 10 / Activo VLAN 20)
+### 12.2 Configuración HSRP en Router0 (Standby VLAN 11 / Activo VLAN 21)
 
 ```bash
 enable
 configure terminal
 
-# HSRP en VLAN 10 — Router0 es STANDBY (prioridad 90)
-interface GigabitEthernet0/1.10
-standby 10 ip 192.198.10.65
-standby 10 priority 90
-standby 10 preempt
+# HSRP en VLAN 11 — Router0 es STANDBY (prioridad 90)
+interface GigabitEthernet0/1.11
+standby 11 ip 192.198.11.65
+standby 11 priority 90
+standby 11 preempt
 exit
 
-# HSRP en VLAN 20 — Router0 es ACTIVO (prioridad 110)
-interface GigabitEthernet0/1.20
-standby 20 ip 192.198.10.1
-standby 20 priority 110
-standby 20 preempt
+# HSRP en VLAN 21 — Router0 es ACTIVO (prioridad 110)
+interface GigabitEthernet0/1.21
+standby 21 ip 192.198.11.1
+standby 21 priority 110
+standby 21 preempt
 exit
 
 end
@@ -1736,8 +1728,8 @@ show standby brief
                      P indicates configured to preempt.
                      |
 Interface   Grp  Pri P State    Active          Standby         Virtual IP
-Gig0/1.10   10   110 P Active   local           192.198.10.67   192.198.10.65
-Gig0/1.20   20   90  P Standby  192.198.10.2    local           192.198.10.1
+Gig0/1.11   11   110 P Active   local           192.198.11.67   192.198.11.65
+Gig0/1.21   21   90  P Standby  192.198.11.2    local           192.198.11.1
 ```
 
 **Resultado obtenido en Router0:**
@@ -1746,23 +1738,23 @@ Gig0/1.20   20   90  P Standby  192.198.10.2    local           192.198.10.1
                      P indicates configured to preempt.
                      |
 Interface   Grp  Pri P State    Active          Standby         Virtual IP
-Gig0/1.10   10   90  P Standby  192.198.10.66   local           192.198.10.65
-Gig0/1.20   20   110 P Active   local           192.198.10.3    192.198.10.1
+Gig0/1.11   11   90  P Standby  192.198.11.66   local           192.198.11.65
+Gig0/1.21   21   110 P Active   local           192.198.11.3    192.198.11.1
 ```
 
 ### 12.4 Prueba de failover HSRP Piso 1
 
-1. Con Router1 activo en VLAN 10, hacer ping desde un PC en VLAN 10 hacia cualquier destino — debe responder ✅
+1. Con Router1 activo en VLAN 11, hacer ping desde un PC en VLAN 11 hacia cualquier destino — debe responder ✅
 2. Apagar Router1 en Packet Tracer (clic derecho → Power Off)
-3. Esperar ~10 segundos para que Router0 asuma el rol activo en VLAN 10
+3. Esperar ~10 segundos para que Router0 asuma el rol activo en VLAN 11
 4. Hacer ping nuevamente — debe seguir respondiendo a través de Router0 ✅
 5. Encender Router1 nuevamente — retoma el rol activo gracias a `preempt` �
 
 ## HSRP — Data Center
 
-En el Data Center, Router2 es el router activo para ambas VLANs (30 y 40).
+En el Data Center, Router2 es el router activo para ambas VLANs (31 y 41).
 
-| Router  | VLAN 30 | VLAN 40 | Prioridad            |
+| Router  | VLAN 31 | VLAN 41 | Prioridad            |
 | ------- | ------- | ------- | -------------------- |
 | Router2 | Activo  | Activo  | 110 (mayor)          |
 | Router3 | Standby | Standby | 100 (menor, default) |
@@ -1771,10 +1763,10 @@ Las IPs virtuales HSRP del Data Center son:
 
 | VLAN                   | IP Virtual HSRP   | Uso                    |
 | ---------------------- | ----------------- | ---------------------- |
-| VLAN 30 — WEB_SERVERS  | `192.198.100.1`   | Gateway del ServerWeb  |
-| VLAN 40 — DHCP_SERVERS | `192.198.100.129` | Gateway del ServerDHCP |
+| VLAN 31 — WEB_SERVERS  | `192.198.100.1`   | Gateway del ServerWeb  |
+| VLAN 41 — DHCP_SERVERS | `192.198.100.129` | Gateway del ServerDHCP |
 
-> **Importante:** HSRP se configura en las **subinterfaces** `Gi0/1.30` y `Gi0/1.40` de cada router, ya que es por `Gi0/1` donde están conectados los servidores a través de Switch3.
+> **Importante:** HSRP se configura en las **subinterfaces** `Gi0/1.31` y `Gi0/1.41` de cada router, ya que es por `Gi0/1` donde están conectados los servidores a través de Switch3.
 
 ### 12.5 Configuración HSRP en Router2 (Activo)
 
@@ -1782,18 +1774,18 @@ Las IPs virtuales HSRP del Data Center son:
 enable
 configure terminal
 
-# HSRP en VLAN 30 — Router2 es ACTIVO (prioridad 110)
-interface GigabitEthernet0/1.30
-standby 30 ip 192.198.100.1
-standby 30 priority 110
-standby 30 preempt
+# HSRP en VLAN 31 — Router2 es ACTIVO (prioridad 110)
+interface GigabitEthernet0/1.31
+standby 31 ip 192.198.100.1
+standby 31 priority 110
+standby 31 preempt
 exit
 
-# HSRP en VLAN 40 — Router2 es ACTIVO (prioridad 110)
-interface GigabitEthernet0/1.40
-standby 40 ip 192.198.100.129
-standby 40 priority 110
-standby 40 preempt
+# HSRP en VLAN 41 — Router2 es ACTIVO (prioridad 110)
+interface GigabitEthernet0/1.41
+standby 41 ip 192.198.100.129
+standby 41 priority 110
+standby 41 preempt
 exit
 
 end
@@ -1806,14 +1798,14 @@ write memory
 enable
 configure terminal
 
-# HSRP en VLAN 30 — Router3 es STANDBY (prioridad default 100)
-interface GigabitEthernet0/1.30
-standby 30 ip 192.198.100.1
+# HSRP en VLAN 31 — Router3 es STANDBY (prioridad default 100)
+interface GigabitEthernet0/1.31
+standby 31 ip 192.198.100.1
 exit
 
-# HSRP en VLAN 40 — Router3 es STANDBY (prioridad default 100)
-interface GigabitEthernet0/1.40
-standby 40 ip 192.198.100.129
+# HSRP en VLAN 41 — Router3 es STANDBY (prioridad default 100)
+interface GigabitEthernet0/1.41
+standby 41 ip 192.198.100.129
 exit
 
 end
@@ -1859,16 +1851,16 @@ show standby brief
 
 ```
 Interface   Grp  Pri P State    Active          Standby         Virtual IP
-Gi0/1.30    30   110 P Active   local           192.198.100.4   192.198.100.1
-Gi0/1.40    40   110 P Active   local           192.198.100.132 192.198.100.129
+Gi0/1.31    31   110 P Active   local           192.198.100.4   192.198.100.1
+Gi0/1.41    41   110 P Active   local           192.198.100.132 192.198.100.129
 ```
 
 **Resultado esperado en Router3:**
 
 ```
 Interface   Grp  Pri P State    Active          Standby         Virtual IP
-Gi0/1.30    30   100   Standby  192.198.100.3   local           192.198.100.1
-Gi0/1.40    40   100   Standby  192.198.100.131 local           192.198.100.129
+Gi0/1.31    31   100   Standby  192.198.100.3   local           192.198.100.1
+Gi0/1.41    41   100   Standby  192.198.100.131 local           192.198.100.129
 ```
 
 ### 12.9 Prueba de failover HSRP Data Center
