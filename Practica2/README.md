@@ -90,10 +90,9 @@ La red está compuesta por cuatro secciones principales interconectadas:
 
 La interconexión entre secciones se realiza mediante **EtherChannel LACP** utilizando 4 interfaces físicas por enlace, lo que proporciona un mayor ancho de banda agregado y redundancia ante fallos de enlace individuales.
 
-**Data Center — Biblioteca Central**
-
-| Dispositivo Origen | Puerto             | Dispositivo Destino | Puerto             |
-| ------------------ | ------------------ | ------------------- | ------------------ |
+**Data Center - Biblioteca Central**
+| Dispositivo Origen | Puerto | Dispositivo Destino |Puerto |
+| -------------------------------- | -------------------------------------------------------------------------------- | ----------- |----------- |
 | Multilayer Switch2 | GigabitEthernet0/1 | Router2 | GigabitEthernet0/0 |
 | Multilayer Switch2 | GigabitEthernet0/2 | Router3 | GigabitEthernet0/0 |
 | Router2 | GigabitEthernet0/1 | Switch3 | GigabitEthernet0/1 |
@@ -112,7 +111,7 @@ La interconexión entre secciones se realiza mediante **EtherChannel LACP** util
 | Switch0            | FastEthernet0/24   | PC1                 | FastEthernet0      |
 | Switch0            | FastEthernet0/23   | Laptop1             | FastEthernet0      |
 
-**Conexión Data Center — Piso 1**
+**Conexión Data Center - Piso1**
 
 | Dispositivo Origen | Puerto           | Dispositivo Destino | Puerto           |
 | ------------------ | ---------------- | ------------------- | ---------------- |
@@ -122,12 +121,11 @@ La interconexión entre secciones se realiza mediante **EtherChannel LACP** util
 | Multilayer Switch2 | FastEthernet0/21 | Multilayer Switch4  | FastEthernet0/21 |
 
 **Piso 2**
-
-| Dispositivo Origen | Puerto             | Dispositivo Destino | Puerto        |
-| ------------------ | ------------------ | ------------------- | ------------- |
-| Multilayer Switch0 | GigabitEthernet0/1 | Wireless Router0    | Internet      |
-| Multilayer Switch0 | GigabitEthernet0/2 | Wireless Router1    | Internet      |
-| Wireless Router0   | Ethernet1          | PC3                 | FastEthernet0 |
+| Dispositivo Origen | Puerto | Dispositivo Destino | Puerto |
+| ------------------ | -------------- | ------------------- | -------------- |
+| Multilayer Switch0 | GigabitEthernet0/1 | Wireless Router0 | Internet|
+| Multilayer Switch0 | GigabitEthernet0/2 | Wireless Router1 | Internet|
+| Wireless Router0 | Ethernet1 | PC3 | FastEthernet0 |
 
 **Conexión de Piso 2 con Piso 1**
 
@@ -1656,7 +1654,7 @@ En esta práctica, HSRP se configura en dos lugares:
 - **Piso 1** (secciones 12.1–12.4): Router0 y Router1, para las VLANs 10 y 20
 - **Data Center** (secciones 12.5–12.9): Router2 y Router3, para las VLANs 30 y 40
 
-### HSRP — Piso 1
+## HSRP — Piso 1
 
 En el Piso 1 se implementa **HSRP con balanceo de carga**: cada router es activo para una VLAN distinta. Esto aprovecha ambos enlaces y evita que un router quede ocioso.
 
@@ -1754,13 +1752,13 @@ Gig0/1.20   20   110 P Active   local           192.198.10.3    192.198.10.1
 
 ### 12.4 Prueba de failover HSRP Piso 1
 
-1. Con Router1 activo en VLAN 10, hacer ping desde un PC en VLAN 10 hacia cualquier destino — debe responder (OK)
+1. Con Router1 activo en VLAN 10, hacer ping desde un PC en VLAN 10 hacia cualquier destino — debe responder ✅
 2. Apagar Router1 en Packet Tracer (clic derecho → Power Off)
 3. Esperar ~10 segundos para que Router0 asuma el rol activo en VLAN 10
-4. Hacer ping nuevamente — debe seguir respondiendo a través de Router0 (OK)
-5. Encender Router1 nuevamente — retoma el rol activo gracias a `preempt` (OK)
+4. Hacer ping nuevamente — debe seguir respondiendo a través de Router0 ✅
+5. Encender Router1 nuevamente — retoma el rol activo gracias a `preempt` �
 
-### HSRP — Data Center
+## HSRP — Data Center
 
 En el Data Center, Router2 es el router activo para ambas VLANs (30 y 40).
 
@@ -1877,11 +1875,11 @@ Gi0/1.40    40   100   Standby  192.198.100.131 local           192.198.100.129
 
 Para verificar que HSRP funciona correctamente ante un fallo:
 
-1. Con Router2 activo, hacer ping desde Router1 hacia `192.198.100.2` — debe responder (OK)
+1. Con Router2 activo, hacer ping desde Router1 hacia `192.198.100.2` — debe responder ✅
 2. Apagar Router2 en Packet Tracer (clic derecho → Power Off)
 3. Esperar 10 segundos para que Router3 tome el rol activo
-4. Hacer ping nuevamente desde Router1 hacia `192.198.100.2` — debe seguir respondiendo (OK)
-5. Encender Router2 nuevamente — debe retomar el rol activo gracias a `preempt` (OK)
+4. Hacer ping nuevamente desde Router1 hacia `192.198.100.2` — debe seguir respondiendo ✅
+5. Encender Router2 nuevamente — debe retomar el rol activo gracias a `preempt` �
 
 ```bash
 # Desde Router1 — prueba antes del fallo
