@@ -10,7 +10,7 @@
 | Campo            | Detalle    |
 | ---------------- | ---------- |
 | Número de Grupo  | 28         |
-| Fecha de Entrega | 27/03/2026 |
+| Fecha de Entrega | 10/04/2026 |
 
 ## Integrantes
 
@@ -19,71 +19,6 @@
 | 1   | _David Estuardo Barrios Ramírez_ | _202300670_ |
 | 2   | _Marcos Daniel Bonifasi de Leon_ | _202202410_ |
 | 3   | _Enner Esaí Mendizabal Castro_   | _202302220_ |
-
----
-
-## Resumen de Cambios v8
-
-> **⚠️ CAMBIOS EN ESTA VERSIÓN:** Correcciones menores de configuración OSPF, VLANs fantasma en MS2, `ip helper-address` innecesarios en servidores y registro DNS NS redundante.
-
-| # | Error | Corrección |
-|---|-------|------------|
-| 1 | MS0 y MS3 no tenían `passive-interface` en OSPF para sus puertos Gi0/1 y Gi0/2 (conectados a WRT300Ns). OSPF enviaba hellos hacia los routers inalámbricos sin respuesta. | **Agregado `passive-interface GigabitEthernet0/1` y `passive-interface GigabitEthernet0/2`** en secciones 10.8 y 10.9. |
-| 2 | MS2 tenía `vlan 31` y `vlan 41` definidas, pero todos sus puertos son routed ports (`no switchport`). Esas VLANs no tienen ningún puerto asignado y generan confusión en `show vlan brief`. | **Eliminadas `vlan 31` y `vlan 41` de la configuración de MS2** (sección 6.2). |
-| 3 | R2 y R3 tenían `ip helper-address 192.198.100.130` en las subinterfaces `.31` y `.41`. Los servidores Web y DHCP tienen IPs estáticas y nunca solicitan DHCP. Configuración muerta que puede confundir durante la calificación. | **Eliminados los `ip helper-address`** de las subinterfaces `.31` y `.41` de R2 y R3 (secciones 7.4 y 7.5). |
-| 4 | Registro DNS tipo NS (`practica2_Grupo1.com NS www.practica2_Grupo1.com`) es técnicamente incorrecto: un NS record debe apuntar a un servidor DNS, no a un servidor web. En Packet Tracer puede causar comportamiento inesperado. | **Eliminado el registro NS**. Se conservan únicamente los dos registros tipo A (sección 9.1). |
-| 5 | El orden de configuración en el documento no advertía que LACP debe aplicarse antes que OSPF. Si se configura OSPF primero, los `network` statements que referencian Po1/Po2/Po6/Po7/Po8 no encontrarán interfaces activas. | **Agregada nota de orden de implementación** en sección 11 (LACP). |
-
----
-
-## Resumen de Cambios v7
-
-> **⚠️ CAMBIOS CRÍTICOS EN ESTA VERSIÓN:** Corrección del error arquitectónico principal: MS0 y MS3 ya NO usan SVI VLAN 11. En su lugar utilizan puertos enrutados (routed ports) con subredes /30 propias del espacio 10.2.1.x para conectarse a los WRT300Ns. Esto elimina la superposición de subredes en OSPF y el problema de gateway inalcanzable en los routers inalámbricos.
-
-| # | Error | Corrección |
-|---|-------|------------|
-| 1 | MS0/MS3 tenían SVI Vlan11 en 192.198.11.128/27 → misma subred que R0/R1 en Switch0 (Piso 1). OSPF anunciaba el mismo prefijo desde 4 dispositivos distintos. MS4 no sabía a cuál reenviar. | **Eliminadas SVIs VLAN 11 de MS0 y MS3.** Se reemplazan por routed ports en subredes /30 independientes (10.2.1.28/30, .32/30, .36/30, .40/30). |
-| 2 | WRT300N apuntaba gateway a 192.198.11.129 (HSRP VIP de Piso 1), pero el único vecino L2 del WRT300N era MS0. MS0 intentaba ARP por .129 en su propio segmento VLAN 11, sin éxito. El WRT300N nunca podía llegar a su gateway. | **WRT300N ahora apunta su gateway directamente al routed port de MS0/MS3** (p.ej. 10.2.1.29). La conectividad es directa y funcional. |
-| 3 | Pool ADMIN tenía Start IP en .138, reservando .132-.137 para SVIs y WRT300Ns que ya no existen. Espacio desperdiciado. | **Pool ADMIN inicia ahora en .132**, aprovechando las IPs liberadas. |
-| 4 | Tabla de enrutamiento 10.2.1.x en sección 5.6 no incluía los enlaces MS0/MS3 → WRT300Ns. | **Agregados 4 nuevos enlaces /30** en la tabla de subnetting de enrutamiento. |
-| 5 | Tabla OSPF 10.1 y configuraciones OSPF de MS0/MS3 anunciaban 192.198.11.128/27 (red que ya no les pertenece). | **Actualizados** para anunciar únicamente sus nuevas subredes /30. |
-| 6 | Router3 no tenía `standby priority` explícita para VLAN 31 ni VLAN 41 en la documentación. | **Agregadas prioridades explícitas** (100) para completar la documentación. |
-| 7 | Sección 15 Nota 2 describía la arquitectura antigua con SVIs. | **Actualizada** para reflejar los routed ports. |
-| 8 | Sección 8.3 describía Access Port VLAN 11 en MS0/MS3. | **Actualizada** para reflejar routed ports con /30. |
-
----
-
-## Resumen de Cambios v6
-
-> **⚠️ CAMBIOS EN ESTA VERSIÓN:** Corrección de textos descriptivos con `/28` incorrecto → `/27`, y corrección de la tabla OSPF donde MS4 listaba subredes de Piso 1 que no le corresponden.
-
-| # | Error | Corrección |
-|---|-------|------------|
-| 1 | Sección 8.2 encabezado: `192.198.11.128/28` | Corregido a `/27` |
-| 2 | Tabla OSPF 10.1 — fila MS4 listaba `192.198.11.0/25, 192.198.11.128/28` | Eliminadas (MS4 no tiene interfaces ahí; las anuncia R0/R1) |
-| 3 | Tabla OSPF 10.1 — Router1, Router0, MS0, MS3 mostraban `/28` | Corregido a `/27` en todos |
-| 4 | Sección 15 Nota 3: `192.198.11.128/28` | Corregido a `/27` |
-| 5 | Sección 15 Nota 5: `192.198.11.128/28` | Corregido a `/27` |
-| 6 | Nota debajo de tabla OSPF (10.1): `192.198.11.128/28` | Corregido a `/27` |
-
----
-
-## Resumen de Cambios v5
-
-> **⚠️ CAMBIOS CRÍTICOS EN ESTA VERSIÓN:** Esta versión corrige conflictos de IPs dentro del pool DHCP de ADMIN y errores menores en OSPF y HSRP.
-
-| # | Error | Corrección |
-|---|-------|------------|
-| 1 | VLAN 21 solo 59 hosts DHCP con /26 | **Cambiado a /25** → 123 hosts DHCP |
-| 2 | VLAN 11 ADMIN en /28 tenía solo 4 IPs libres para hosts | **Cambiado a /27** → 21+ IPs DHCP libres |
-| 3 | SVIs MS0/MS3 (.133/.134) y WRT300Ns (.135-.138) estaban dentro del pool DHCP → conflictos | **Corregido en v7** con arquitectura de routed ports |
-| 4 | WRT300N WAN IP en subred incorrecta | **Corregido en v7**: IPs en subredes /30 independientes |
-| 5 | MS0/MS3 sin SVIs para DHCP relay | **Reemplazado en v7** por routed ports directos |
-| 6 | DNS no configurado en WRT300N | **AGREGADO: 192.198.100.2** |
-| 7 | MS4 OSPF anunciaba subredes 192.198.11.x sin interfaces directas ahí | **Eliminados** |
-| 8 | OSPF verification mostraba IPs de interfaz como Neighbor ID | **Corregido a 33.33.33.33 y 34.34.34.34** |
-| 9 | MS2 tenía VLANs 11 y 21 definidas sin uso en el Data Center | **Eliminadas** |
-| 10 | Router3 sin priority explícita en HSRP VLAN 41 | **Corregido en v7** con prioridades explícitas |
 
 ---
 
@@ -772,6 +707,7 @@ write memory
 | **Wireless** | Broadcast | Disabled |
 | **Wireless Security** | Mode | WPA2 Personal |
 | **Wireless Security** | Passphrase | `G1_PISO2` |
+| **Administration** | Router Password | `Grupo1_P2` |
 
 #### Wireless Router1 (Piso 2 - WLAN2)
 
@@ -792,6 +728,7 @@ write memory
 | **Wireless** | Broadcast | Disabled |
 | **Wireless Security** | Mode | WPA2 Personal |
 | **Wireless Security** | Passphrase | `G1_PISO2` |
+| **Administration** | Router Password | `Grupo1_P2` |
 
 #### Wireless Router2 (Piso 3 - WLAN1)
 
@@ -812,6 +749,7 @@ write memory
 | **Wireless** | Broadcast | Enabled |
 | **Wireless Security** | Mode | WPA2 Personal |
 | **Wireless Security** | Passphrase | `G1_PISO3` |
+| **Administration** | Router Password | `Grupo1_P3` |
 
 #### Wireless Router3 (Piso 3 - WLAN2)
 
@@ -832,6 +770,7 @@ write memory
 | **Wireless** | Broadcast | Enabled |
 | **Wireless Security** | Mode | WPA2 Personal |
 | **Wireless Security** | Passphrase | `G1_PISO3` |
+| **Administration** | Router Password | `Grupo1_P3` |
 
 ### 8.3 Conexión Física MS0/MS3 → WRT300N — CORREGIDA v7
 
@@ -1123,6 +1062,8 @@ Neighbor ID     Pri   State           Dead Time   Address         Interface
 34.34.34.34      1   FULL/BDR        00:00:37    10.2.1.22       Po7
 22.22.22.22      1   FULL/BDR        00:00:33    10.2.1.26       Po8
 ```
+
+> **Nota técnica (Packet Tracer):** En enlaces enrutados punto a punto (por ejemplo, los conectados hacia WRT300N), el estado del vecino puede mostrarse como `FULL/-` sin designación explícita DR/BDR. Este comportamiento es normal y no representa un error de configuración OSPF.
 
 ## 11. Configuración LACP
 
