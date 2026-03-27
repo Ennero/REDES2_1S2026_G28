@@ -76,57 +76,7 @@ La biblioteca de la Facultad de Ingeniería de la USAC presenta deficiencias cr�
 
 ## 4. Topología Propuesta
 
-```
-                    ┌─────────────────────────────────────────────────────┐
-                    │                    DATA CENTER                       │
-                    │   ┌──────────┐  ┌──────────┐                       │
-                    │   │ ServerWeb│  │ServerDHCP│                       │
-                    │   │(VLAN 31) │  │(VLAN 41) │                       │
-                    │   └────┬─────┘  └────┬─────┘                       │
-                    │          │             │                              │
-                    │   ┌─────┴─────────────┴─────┐                       │
-                    │   │        Switch3           │                       │
-                    │   │    (VLANs 31, 41)        │                       │
-                    │   └───────────┬──────────────┘                       │
-                    │               │  Trunk                               │
-                    │   ┌───────────┴──────────────┐                      │
-                    │   │  R2 (Gi0/1.31, Gi0/1.41) │◄─ HSRP Activo       │
-                    │   │  R3 (Gi0/1.31, Gi0/1.41) │◄─ HSRP Standby      │
-                    │   └───────┬──────────┬────────┘                      │
-                    │           │Gi0/0     │Gi0/0                          │
-                    │   ┌───────┴──────────┴────────┐                      │
-                    │   │    Multilayer Switch2 (L3)         │                      │
-                    │   │ Po1 (10.2.1.26/30 ↔ Multilayer Switch4 Po8 10.2.1.25/30) │
-                    └───┴───────────────────────────┴──────────────────────┘
-                                        │ LACP Po1/Po8 (4 puertos Fa0/21-24)
-                    ┌───────────────────┴────────────────────────────────┐
-                    │           Multilayer Switch4 (L3 Core — Piso 1)             │
-                    │  Gi0/1─────────────────────────────Gi0/2           │
-                    │ (10.2.1.9/30)                   (10.2.1.13/30)     │
-                    │     │                                   │           │
-                    │  Router1 (HSRP Activo V11)      Router0 (HSRP Act V21) │
-                    │     │ Gi0/1 → Switch0             │ Gi0/1 → Switch0 │
-                    │     └──────────┬──────────────────┘                 │
-                    │                │                                     │
-                    │          Switch0 (VLANs 11, 21)                     │
-                    │          PC1(V21) / Laptop1(V11)                    │
-                    │                                                      │
-                    │  Po6 (10.2.1.17/30)     Po7 (10.2.1.21/30)         │
-                    └──────────┬─────────────────────┬────────────────────┘
-                               │ LACP (Fa0/17-20)    │ LACP (Fa0/13-16)
-                    ┌──────────┴────────┐   ┌─────────┴──────────┐
-                    │ Multilayer Switch0 (L3-Piso 2) │ Multilayer Switch3 (L3-Piso 3) │
-                    │ Po2: 10.2.1.18/30 │   │ Po3: 10.2.1.22/30  │
-                    │ Gi0/1: 10.2.1.29  │   │ Gi0/1: 10.2.1.37   │
-                    │ Gi0/2: 10.2.1.33  │   │ Gi0/2: 10.2.1.41   │
-                    └────┬─────────┬────┘   └───┬────────────┬───┘
-                         │         │             │            │
-                   WRT-P2R1   WRT-P2R2     WRT-P3R1    WRT-P3R2
-                  WAN:.30/30  WAN:.34/30  WAN:.38/30  WAN:.42/30
-                  GW:.29      GW:.33      GW:.37      GW:.41
-                  WLAN1-P2    WLAN2-P2    WLAN1-P3    WLAN2-P3
-               192.198.21.0/25 192.198.21.128/25 192.198.31.0/25 192.198.31.128/25
-```
+![Topología Propuesta](img/topologia.png)
 
 ## 5. Subnetting
 
@@ -253,6 +203,8 @@ end
 write memory
 ```
 
+![VLANs Switch3 (Data Center)](img/Vlans/Switch3_vlan.png)
+
 ### 6.2 Multilayer Switch2 (Data Center)
 
 ```bash
@@ -277,6 +229,8 @@ exit
 end
 write memory
 ```
+
+![VLANs Multilayer Switch2 (Data Center)](img/Vlans/MS2_vlan.png)
 
 ### 6.3 Switch0 (Piso 1)
 
@@ -325,6 +279,8 @@ exit
 end
 write memory
 ```
+
+![VLANs Switch0 (Piso 1)](img/Vlans/Switch0_vlan.png)
 
 ### 6.4 Multilayer Switch4 (Piso 1 - Core)
 
@@ -562,6 +518,8 @@ end
 write memory
 ```
 
+![Configuración DHCP Router2 (Data Center - HSRP Activo)](img/DHCP/Router1_DHCP.png)
+
 ### 7.5 Router3 (Data Center - HSRP Standby)
 
 ```bash
@@ -600,6 +558,8 @@ exit
 end
 write memory
 ```
+
+![Configuración DHCP Router3 (Data Center - HSRP Standby)](img/DHCP/Router0_DHCP.png)
 
 ### 7.6 Router1 (Piso 1 - HSRP Activo VLAN 11, Standby VLAN 21)
 
@@ -725,6 +685,8 @@ Los puertos WAN usan subredes /30 del espacio 10.2.1.x. El gateway apunta direct
 | **Wireless Security** | Passphrase | `G1_PISO2` |
 | **Administration** | Router Password | `Grupo1_P2` |
 
+![Configuración WRT300N Piso 2 - WLAN1](img/WIRELESS-ROUTER/WRT300N_Piso2_WLAN1.png)
+
 #### Wireless Router0(1) (Piso 2 - WLAN2)
 
 | Sección | Parámetro | Valor |
@@ -745,6 +707,8 @@ Los puertos WAN usan subredes /30 del espacio 10.2.1.x. El gateway apunta direct
 | **Wireless Security** | Mode | WPA2 Personal |
 | **Wireless Security** | Passphrase | `G1_PISO2` |
 | **Administration** | Router Password | `Grupo1_P2` |
+
+![Configuración WRT300N Piso 2 - WLAN2](img/WIRELESS-ROUTER/WRT300N_Piso2_WLAN2.png)
 
 #### Wireless Router2 (Piso 3 - WLAN1)
 
@@ -767,6 +731,8 @@ Los puertos WAN usan subredes /30 del espacio 10.2.1.x. El gateway apunta direct
 | **Wireless Security** | Passphrase | `G1_PISO3` |
 | **Administration** | Router Password | `Grupo1_P3` |
 
+![Configuración WRT300N Piso 3 - WLAN1](img/WIRELESS-ROUTER/WRT300N_Piso3_WLAN1.png)
+
 #### Wireless Router3 (Piso 3 - WLAN2)
 
 | Sección | Parámetro | Valor |
@@ -782,11 +748,13 @@ Los puertos WAN usan subredes /30 del espacio 10.2.1.x. El gateway apunta direct
 | **DHCP** | Start IP | `192.198.31.130` |
 | **DHCP** | Max Users | `80` |
 | **DHCP** | DNS Server | `192.198.100.2` |
-| **Wireless** | SSID | `PISO3_G1_R2` |
+| **Wireless** | SSID | `PISO3_G1_R3` |
 | **Wireless** | Broadcast | Enabled |
 | **Wireless Security** | Mode | WPA2 Personal |
 | **Wireless Security** | Passphrase | `G1_PISO3` |
 | **Administration** | Router Password | `Grupo1_P3` |
+
+![Configuración WRT300N Piso 3 - WLAN2](img/WIRELESS-ROUTER/WRT300N_Piso3_WLAN2.png)
 
 ### 8.3 Conexión Física Multilayer Switch0/Multilayer Switch3 → WRT300N
 
@@ -831,6 +799,18 @@ exit
 - Configurar WAN como Static IP con los valores de la sección 8.2.
 - El gateway del WRT300N es directamente el IP del routed port del Multilayer Switch.
 
+
+### 8.4 Conexión de Clientes Cableados a WRT300N (PC2, PC3)
+
+En la topología original, algunos equipos de escritorio en los pisos 2 y 3 se conectan de manera cableada a los routers inalámbricos. 
+El router WRT300N actúa como un switch para sus puertos LAN, uniendo la red cableada e inalámbrica en el mismo dominio de broadcast.
+
+**Configuración física:**
+- Se utiliza cable de cobre directo (Straight-Through).
+- Conectar desde el puerto `FastEthernet0` de la PC hacia cualquiera de los puertos `Ethernet 1, 2, 3 o 4` del WRT300N.
+- Las PCs deben estar configuradas para obtener su direccionamiento por DHCP. Recibirán IP del mismo pool local que los clientes WiFi y tendrán la misma salida NAT hacia los servidores.
+
+
 ## 9. Configuración DNS y Servidor Web
 
 ### 9.1 DNS en ServerWeb
@@ -842,6 +822,8 @@ exit
 |------|------|---------|
 | www.practica2_Grupo1.com | A | 192.198.100.2 |
 | practica2_Grupo1.com | A | 192.198.100.2 |
+
+![Configuración DNS en ServerWeb](img/DNS/DNS_ServerWeb.png)
 
 ### 9.2 HTTP en ServerWeb
 
@@ -1142,6 +1124,8 @@ no shutdown
 exit
 ```
 
+![LACP Multilayer Switch4](img/LACP/MS4_LACP.png)
+
 ### 11.3 Multilayer Switch2
 
 ```bash
@@ -1156,6 +1140,8 @@ ip address 10.2.1.26 255.255.255.252
 no shutdown
 exit
 ```
+
+![LACP Multilayer Switch2](img/LACP/MS2_LACP.png)
 
 ### 11.4 Multilayer Switch0
 
@@ -1306,6 +1292,7 @@ ping 192.198.100.2
 - [x] HSRP failover (apagar Router1 → Router0 toma el control)
 - [x] HSRP failover Data Center (apagar Router2 → Router3 asume)
 - [x] LACP failover (desconectar un enlace del bundle → tráfico continúa)
+- [x] PC por cable en WRT300N (Piso 2/3) recibe IP local y resuelve DNS hacia Servidor Web
 
 ## 15. Notas Importantes
 
@@ -1322,6 +1309,8 @@ ping 192.198.100.2
 6. **DNS en WRT300N**: Todos los WRT300N tienen configurado DNS Server `192.198.100.2` para que los clientes WiFi puedan resolver www.practica2_Grupo1.com.
 
 7. **Flujo NAT WiFi**: Los clientes WiFi obtienen IPs en 192.198.21.x o 192.198.31.x. El WRT300N hace NAT hacia su WAN (10.2.1.x/30). Multilayer Switch0/Multilayer Switch3 enrutan hacia Multilayer Switch4, que enruta hacia el Data Center. El retorno funciona por OSPF.
+
+8. **Puertos LAN del WRT300N:** Los puertos Ethernet 1-4 de los WRT300N comparten la misma configuración LAN y DHCP que la interfaz inalámbrica. Los equipos cableados a estos puertos experimentan el mismo proceso de NAT al salir hacia el Data Center.
 
 ---
 
