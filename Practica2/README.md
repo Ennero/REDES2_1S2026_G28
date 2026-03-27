@@ -10,7 +10,7 @@
 | Campo            | Detalle    |
 | ---------------- | ---------- |
 | Número de Grupo  | 28         |
-| Fecha de Entrega | 10/04/2026 |
+| Fecha de Entrega | 27/03/2026 |
 
 ## Integrantes
 
