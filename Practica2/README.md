@@ -20,6 +20,24 @@
 | 2   | _Marcos Daniel Bonifasi de Leon_ | _202202410_ |
 | 3   | _Enner Esaí Mendizabal Castro_   | _202302220_ |
 
+## Índice
+
+- [1. Introducción](#1-introducción)
+- [2. Objetivos](#2-objetivos)
+- [3. Descripción del Problema](#3-descripción-del-problema)
+- [4. Topología Propuesta](#4-topología-propuesta)
+- [5. Subnetting](#5-subnetting)
+- [6. Configuración de VLANs](#6-configuración-de-vlans)
+- [7. Configuración DHCP](#7-configuración-dhcp)
+- [8. Configuración Inalámbrica](#8-configuración-inalámbrica)
+- [9. Configuración DNS y Servidor Web](#9-configuración-dns-y-servidor-web)
+- [10. Configuración OSPF](#10-configuración-ospf)
+- [11. Configuración LACP](#11-configuración-lacp)
+- [12. Configuración HSRP](#12-configuración-hsrp)
+- [13. Comandos de Verificación](#13-comandos-de-verificación)
+- [14. Pruebas de Conectividad](#14-pruebas-de-conectividad)
+- [15. Notas Importantes](#15-notas-importantes)
+
 ---
 
 ## 1. Introducción
@@ -77,12 +95,12 @@ La biblioteca de la Facultad de Ingeniería de la USAC presenta deficiencias cr�
                     │   └───────┬──────────┬────────┘                      │
                     │           │Gi0/0     │Gi0/0                          │
                     │   ┌───────┴──────────┴────────┐                      │
-                    │   │       MS2 (L3)             │                      │
-                    │   │  Po1 (10.2.1.25/26 ↔ MS4) │                      │
+                    │   │    Multilayer Switch2 (L3)         │                      │
+                    │   │ Po1 (10.2.1.26/30 ↔ Multilayer Switch4 Po8 10.2.1.25/30) │
                     └───┴───────────────────────────┴──────────────────────┘
                                         │ LACP Po1/Po8 (4 puertos Fa0/21-24)
                     ┌───────────────────┴────────────────────────────────┐
-                    │                 MS4 (L3 Core — Piso 1)             │
+                    │           Multilayer Switch4 (L3 Core — Piso 1)             │
                     │  Gi0/1─────────────────────────────Gi0/2           │
                     │ (10.2.1.9/30)                   (10.2.1.13/30)     │
                     │     │                                   │           │
@@ -97,7 +115,7 @@ La biblioteca de la Facultad de Ingeniería de la USAC presenta deficiencias cr�
                     └──────────┬─────────────────────┬────────────────────┘
                                │ LACP (Fa0/17-20)    │ LACP (Fa0/13-16)
                     ┌──────────┴────────┐   ┌─────────┴──────────┐
-                    │   MS0 (L3-Piso 2) │   │   MS3 (L3-Piso 3)  │
+                    │ Multilayer Switch0 (L3-Piso 2) │ Multilayer Switch3 (L3-Piso 3) │
                     │ Po2: 10.2.1.18/30 │   │ Po3: 10.2.1.22/30  │
                     │ Gi0/1: 10.2.1.29  │   │ Gi0/1: 10.2.1.37   │
                     │ Gi0/2: 10.2.1.33  │   │ Gi0/2: 10.2.1.41   │
@@ -137,7 +155,7 @@ La biblioteca de la Facultad de Ingeniería de la USAC presenta deficiencias cr�
 > - VLAN 21: .1(HSRP), .2(R0), .3(R1) reservadas | **.4 - .126 → DHCP (123 hosts)**
 > - VLAN 11: .129(HSRP), .130(R1), .131(R0) reservadas | **.132 - .158 → DHCP (27 hosts)**
 >
-> Con la arquitectura v7, las IPs .132-.137 ya no se reservan para infraestructura (MS0/MS3 usan el espacio 10.2.1.x). El pool DHCP ADMIN puede arrancar directamente en .132.
+> Con la arquitectura actual, las IPs .132-.137 ya no se reservan para infraestructura (Multilayer Switch0/Multilayer Switch3 usan el espacio 10.2.1.x). El pool DHCP ADMIN puede arrancar directamente en .132.
 
 ### 5.3 Piso 2 — FLSM (192.198.21.0/24)
 
@@ -166,19 +184,19 @@ La biblioteca de la Facultad de Ingeniería de la USAC presenta deficiencias cr�
 
 | Enlace                                   | Subred         | IP A              | IP B              |
 | ---------------------------------------- | -------------- | ----------------- | ----------------- |
-| R2 ↔ MS2                                | 10.2.1.0/30   | .1 (R2)          | .2 (MS2)         |
-| R3 ↔ MS2                                | 10.2.1.4/30   | .5 (R3)          | .6 (MS2)         |
-| MS4 ↔ R1                                | 10.2.1.8/30   | .9 (MS4)         | .10 (R1)         |
-| MS4 ↔ R0                                | 10.2.1.12/30  | .13 (MS4)        | .14 (R0)         |
-| MS4 ↔ MS0 (Piso 2)                      | 10.2.1.16/30  | .17 (MS4)        | .18 (MS0)        |
-| MS4 ↔ MS3 (Piso 3)                      | 10.2.1.20/30  | .21 (MS4)        | .22 (MS3)        |
-| MS4 ↔ MS2 (Data Center)                 | 10.2.1.24/30  | .25 (MS4)        | .26 (MS2)        |
-| **MS0 ↔ WRT300N Piso2-R1 (WLAN1)**     | **10.2.1.28/30** | **.29 (MS0)**  | **.30 (WRT-P2R1)** |
-| **MS0 ↔ WRT300N Piso2-R2 (WLAN2)**     | **10.2.1.32/30** | **.33 (MS0)**  | **.34 (WRT-P2R2)** |
-| **MS3 ↔ WRT300N Piso3-R1 (WLAN1)**     | **10.2.1.36/30** | **.37 (MS3)**  | **.38 (WRT-P3R1)** |
-| **MS3 ↔ WRT300N Piso3-R2 (WLAN2)**     | **10.2.1.40/30** | **.41 (MS3)**  | **.42 (WRT-P3R2)** |
+| R2 ↔ Multilayer Switch2                         | 10.2.1.0/30   | .1 (R2)          | .2 (Multilayer Switch2)  |
+| R3 ↔ Multilayer Switch2                         | 10.2.1.4/30   | .5 (R3)          | .6 (Multilayer Switch2)  |
+| Multilayer Switch4 ↔ R1                         | 10.2.1.8/30   | .9 (Multilayer Switch4) | .10 (R1)          |
+| Multilayer Switch4 ↔ R0                         | 10.2.1.12/30  | .13 (Multilayer Switch4) | .14 (R0)         |
+| Multilayer Switch4 ↔ Multilayer Switch0 (Piso 2) | 10.2.1.16/30 | .17 (Multilayer Switch4) | .18 (Multilayer Switch0) |
+| Multilayer Switch4 ↔ Multilayer Switch3 (Piso 3) | 10.2.1.20/30 | .21 (Multilayer Switch4) | .22 (Multilayer Switch3) |
+| Multilayer Switch4 ↔ Multilayer Switch2 (Data Center) | 10.2.1.24/30 | .25 (Multilayer Switch4) | .26 (Multilayer Switch2) |
+| **Multilayer Switch0 ↔ WRT300N Piso2-R1 (WLAN1)** | **10.2.1.28/30** | **.29 (Multilayer Switch0)** | **.30 (WRT-P2R1)** |
+| **Multilayer Switch0 ↔ WRT300N Piso2-R2 (WLAN2)** | **10.2.1.32/30** | **.33 (Multilayer Switch0)** | **.34 (WRT-P2R2)** |
+| **Multilayer Switch3 ↔ WRT300N Piso3-R1 (WLAN1)** | **10.2.1.36/30** | **.37 (Multilayer Switch3)** | **.38 (WRT-P3R1)** |
+| **Multilayer Switch3 ↔ WRT300N Piso3-R2 (WLAN2)** | **10.2.1.40/30** | **.41 (Multilayer Switch3)** | **.42 (WRT-P3R2)** |
 
-> **Por qué subredes separadas por WRT300N:** Cada WRT300N necesita un gateway propio y único. Usar un gateway en 192.198.11.128/27 (la subred de Piso 1) causaba que los WRT300Ns apuntaran a la HSRP VIP (.129) pero esa IP sólo se anuncia en el segmento L2 de Switch0 (Piso 1). MS0/MS3 están en un segmento L2 completamente diferente. El ARP para .129 nunca se respondía desde MS0, dejando a los WRT300Ns sin conectividad con su gateway.
+> **Por qué subredes separadas por WRT300N:** Cada WRT300N necesita un gateway propio y único. Usar un gateway en 192.198.11.128/27 (la subred de Piso 1) causaba que los WRT300Ns apuntaran a la HSRP VIP (.129) pero esa IP sólo se anuncia en el segmento L2 de Switch0 (Piso 1). Multilayer Switch0 y Multilayer Switch3 están en un segmento L2 completamente diferente. El ARP para .129 nunca se respondía desde Multilayer Switch0, dejando a los WRT300Ns sin conectividad con su gateway.
 
 ## 6. Configuración de VLANs
 
@@ -203,28 +221,28 @@ vlan 41
 name DHCP_SERVERS
 exit
 
-# ServerWeb
+! ServerWeb
 interface FastEthernet0/24
 switchport mode access
 switchport access vlan 31
 no shutdown
 exit
 
-# ServerDHCP
+! ServerDHCP
 interface FastEthernet0/23
 switchport mode access
 switchport access vlan 41
 no shutdown
 exit
 
-# Trunk hacia R2
+! Trunk hacia R2
 interface GigabitEthernet0/1
 switchport mode trunk
 switchport trunk allowed vlan 31,41
 no shutdown
 exit
 
-# Trunk hacia R3
+! Trunk hacia R3
 interface GigabitEthernet0/2
 switchport mode trunk
 switchport trunk allowed vlan 31,41
@@ -235,7 +253,7 @@ end
 write memory
 ```
 
-### 6.2 MS2 (Data Center)
+### 6.2 Multilayer Switch2 (Data Center)
 
 ```bash
 enable
@@ -243,7 +261,7 @@ configure terminal
 
 ip routing
 
-# Routed ports hacia routers
+! Routed ports hacia routers
 interface GigabitEthernet0/1
 no switchport
 ip address 10.2.1.2 255.255.255.252
@@ -274,7 +292,7 @@ vlan 21
 name ESTUDIANTES
 exit
 
-# Laptop1 - VLAN 11 ADMIN
+! Laptop1 - VLAN 11 ADMIN
 interface FastEthernet0/23
 switchport mode access
 switchport access vlan 11
@@ -282,7 +300,7 @@ spanning-tree portfast
 no shutdown
 exit
 
-# PC1 - VLAN 21 ESTUDIANTES
+! PC1 - VLAN 21 ESTUDIANTES
 interface FastEthernet0/24
 switchport mode access
 switchport access vlan 21
@@ -290,14 +308,14 @@ spanning-tree portfast
 no shutdown
 exit
 
-# Trunk hacia Router1
+! Trunk hacia Router1
 interface GigabitEthernet0/1
 switchport mode trunk
 switchport trunk allowed vlan 11,21
 no shutdown
 exit
 
-# Trunk hacia Router0
+! Trunk hacia Router0
 interface GigabitEthernet0/2
 switchport mode trunk
 switchport trunk allowed vlan 11,21
@@ -308,7 +326,7 @@ end
 write memory
 ```
 
-### 6.4 MS4 (Piso 1 - Core)
+### 6.4 Multilayer Switch4 (Piso 1 - Core)
 
 ```bash
 enable
@@ -332,7 +350,7 @@ vlan 41
 name DHCP_SERVERS
 exit
 
-# Routed ports hacia routers de Piso 1
+! Routed ports hacia routers de Piso 1
 interface GigabitEthernet0/1
 no switchport
 ip address 10.2.1.9 255.255.255.252
@@ -349,9 +367,9 @@ end
 write memory
 ```
 
-### 6.5 MS0 (Piso 2) — ARQUITECTURA v7 CORREGIDA
+### 6.5 Multilayer Switch0 (Piso 2) — ARQUITECTURA CORREGIDA
 
-> **⚠️ CAMBIO ARQUITECTÓNICO v7:** MS0 ya NO tiene SVI VLAN 11 ni puertos access en VLAN 11. En su lugar, usa **routed ports** (no switchport) directamente conectados al puerto WAN de cada WRT300N. Esto elimina el conflicto de subred 192.198.11.128/27 en OSPF y permite que cada WRT300N tenga un gateway real y alcanzable.
+> **⚠️ CAMBIO ARQUITECTÓNICO:** Multilayer Switch0 ya NO tiene SVI VLAN 11 ni puertos access en VLAN 11. En su lugar, usa **routed ports** (no switchport) directamente conectados al puerto WAN de cada WRT300N. Esto elimina el conflicto de subred 192.198.11.128/27 en OSPF y permite que cada WRT300N tenga un gateway real y alcanzable.
 
 ```bash
 enable
@@ -359,21 +377,21 @@ configure terminal
 
 ip routing
 
-# Routed port hacia WRT300N Piso 2 - WLAN1
+! Routed port hacia WRT300N Piso 2 - WLAN1
 interface GigabitEthernet0/1
 no switchport
 ip address 10.2.1.29 255.255.255.252
 no shutdown
 exit
 
-# Routed port hacia WRT300N Piso 2 - WLAN2
+! Routed port hacia WRT300N Piso 2 - WLAN2
 interface GigabitEthernet0/2
 no switchport
 ip address 10.2.1.33 255.255.255.252
 no shutdown
 exit
 
-# LACP hacia MS4 (Piso 1) - LAYER 3
+! LACP hacia Multilayer Switch4 (Piso 1) - LAYER 3
 interface range FastEthernet0/21 - 24
 no switchport
 channel-group 2 mode passive
@@ -389,9 +407,9 @@ end
 write memory
 ```
 
-### 6.6 MS3 (Piso 3) — ARQUITECTURA v7 CORREGIDA
+### 6.6 Multilayer Switch3 (Piso 3) — ARQUITECTURA CORREGIDA
 
-> **⚠️ CAMBIO ARQUITECTÓNICO v7:** Igual que MS0. Ya NO tiene SVI VLAN 11. Usa routed ports /30 independientes para cada WRT300N.
+> **⚠️ CAMBIO ARQUITECTÓNICO:** Igual que Multilayer Switch0. Ya NO tiene SVI VLAN 11. Usa routed ports /30 independientes para cada WRT300N.
 
 ```bash
 enable
@@ -399,21 +417,21 @@ configure terminal
 
 ip routing
 
-# Routed port hacia WRT300N Piso 3 - WLAN1
+! Routed port hacia WRT300N Piso 3 - WLAN1
 interface GigabitEthernet0/1
 no switchport
 ip address 10.2.1.37 255.255.255.252
 no shutdown
 exit
 
-# Routed port hacia WRT300N Piso 3 - WLAN2
+! Routed port hacia WRT300N Piso 3 - WLAN2
 interface GigabitEthernet0/2
 no switchport
 ip address 10.2.1.41 255.255.255.252
 no shutdown
 exit
 
-# LACP hacia MS4 (Piso 1) - LAYER 3
+! LACP hacia Multilayer Switch4 (Piso 1) - LAYER 3
 interface range FastEthernet0/21 - 24
 no switchport
 channel-group 3 mode passive
@@ -464,7 +482,6 @@ write memory
 | Subnet Mask      | `255.255.255.224`  |
 | Max Users        | `27`               |
 
-> **✅ v7:** Pool ADMIN libre de conflictos. IPs .129(HSRP), .130(R1), .131(R0) reservadas. Pool inicia en .132 y llega hasta .158 (27 hosts disponibles, más que suficiente para los 10 de administración requeridos).
 
 **Pool 2 — VLAN 21 (ESTUDIANTES)**
 
@@ -477,7 +494,6 @@ write memory
 | Subnet Mask      | `255.255.255.128`   |
 | Max Users        | `123`               |
 
-> **✅ Soporta 60 hosts:** /25 tiene 126 usables. Reservando .1(HSRP), .2(R0), .3(R1), quedan **123 IPs DHCP**.
 
 **Pool 3 — VLAN 31 (WEB_SERVERS)**
 
@@ -511,18 +527,18 @@ write memory
 enable
 configure terminal
 
-# Hacia MS2
+! Hacia Multilayer Switch2
 interface GigabitEthernet0/0
 ip address 10.2.1.1 255.255.255.252
 no shutdown
 exit
 
-# Hacia Switch3
+! Hacia Switch3
 interface GigabitEthernet0/1
 no shutdown
 exit
 
-# VLAN 31 - WEB_SERVERS (HSRP ACTIVO)
+! VLAN 31 - WEB_SERVERS (HSRP ACTIVO)
 interface GigabitEthernet0/1.31
 encapsulation dot1Q 31
 ip address 192.198.100.3 255.255.255.128
@@ -532,7 +548,7 @@ standby 31 preempt
 no shutdown
 exit
 
-# VLAN 41 - DHCP_SERVERS (HSRP ACTIVO)
+! VLAN 41 - DHCP_SERVERS (HSRP ACTIVO)
 interface GigabitEthernet0/1.41
 encapsulation dot1Q 41
 ip address 192.198.100.131 255.255.255.128
@@ -552,18 +568,18 @@ write memory
 enable
 configure terminal
 
-# Hacia MS2
+! Hacia Multilayer Switch2
 interface GigabitEthernet0/0
 ip address 10.2.1.5 255.255.255.252
 no shutdown
 exit
 
-# Hacia Switch3
+! Hacia Switch3
 interface GigabitEthernet0/1
 no shutdown
 exit
 
-# VLAN 31 - WEB_SERVERS (HSRP STANDBY)
+! VLAN 31 - WEB_SERVERS (HSRP STANDBY)
 interface GigabitEthernet0/1.31
 encapsulation dot1Q 31
 ip address 192.198.100.4 255.255.255.128
@@ -572,7 +588,7 @@ standby 31 priority 100
 no shutdown
 exit
 
-# VLAN 41 - DHCP_SERVERS (HSRP STANDBY)
+! VLAN 41 - DHCP_SERVERS (HSRP STANDBY)
 interface GigabitEthernet0/1.41
 encapsulation dot1Q 41
 ip address 192.198.100.132 255.255.255.128
@@ -592,18 +608,18 @@ enable
 configure terminal
 no ip domain-lookup
 
-# Hacia MS4
+! Hacia Multilayer Switch4
 interface GigabitEthernet0/0
 ip address 10.2.1.10 255.255.255.252
 no shutdown
 exit
 
-# Hacia Switch0
+! Hacia Switch0
 interface GigabitEthernet0/1
 no shutdown
 exit
 
-# VLAN 11 - ADMIN (HSRP ACTIVO)
+! VLAN 11 - ADMIN (HSRP ACTIVO)
 interface GigabitEthernet0/1.11
 encapsulation dot1Q 11
 ip address 192.198.11.130 255.255.255.224
@@ -614,7 +630,7 @@ standby 11 preempt
 no shutdown
 exit
 
-# VLAN 21 - ESTUDIANTES (HSRP STANDBY)
+! VLAN 21 - ESTUDIANTES (HSRP STANDBY)
 interface GigabitEthernet0/1.21
 encapsulation dot1Q 21
 ip address 192.198.11.3 255.255.255.128
@@ -635,18 +651,18 @@ enable
 configure terminal
 no ip domain-lookup
 
-# Hacia MS4
+! Hacia Multilayer Switch4
 interface GigabitEthernet0/0
 ip address 10.2.1.14 255.255.255.252
 no shutdown
 exit
 
-# Hacia Switch0
+! Hacia Switch0
 interface GigabitEthernet0/1
 no shutdown
 exit
 
-# VLAN 11 - ADMIN (HSRP STANDBY)
+! VLAN 11 - ADMIN (HSRP STANDBY)
 interface GigabitEthernet0/1.11
 encapsulation dot1Q 11
 ip address 192.198.11.131 255.255.255.224
@@ -656,7 +672,7 @@ standby 11 priority 90
 no shutdown
 exit
 
-# VLAN 21 - ESTUDIANTES (HSRP ACTIVO)
+! VLAN 21 - ESTUDIANTES (HSRP ACTIVO)
 interface GigabitEthernet0/1.21
 encapsulation dot1Q 21
 ip address 192.198.11.2 255.255.255.128
@@ -678,15 +694,15 @@ write memory
 | Parámetro             | Piso 2              | Piso 3              |
 | --------------------- | ------------------- | ------------------- |
 | SSID (Router 1)       | PISO2_G1_R1        | PISO3_G1_R1        |
-| SSID (Router 2)       | PISO2_G1_R2        | PISO3_G1_R3        |
+| SSID (WLAN2)          | PISO2_G1_R2        | PISO3_G1_R3        |
 | Broadcast SSID        | Deshabilitado (No) | Habilitado (Sí)    |
 | Seguridad             | WPA2 Personal       | WPA2 Personal       |
 | Contraseña de Red     | G1_PISO2           | G1_PISO3           |
 | Contraseña del Router | Grupo1_P2          | Grupo1_P3           |
 
-### 8.2 Configuración WRT300N (GUI de Packet Tracer) — CORREGIDA v7
+### 8.2 Configuración WRT300N (GUI de Packet Tracer)
 
-> **⚠️ CAMBIO v7:** Los puertos WAN ahora usan subredes /30 del espacio 10.2.1.x. El gateway apunta directamente al routed port del MS0/MS3 correspondiente. Ya NO se usa 192.198.11.128/27 en los WRT300Ns.
+Los puertos WAN usan subredes /30 del espacio 10.2.1.x. El gateway apunta directamente al routed port del Multilayer Switch0/Multilayer Switch3 correspondiente. No se usa 192.198.11.128/27 en los WRT300Ns.
 
 #### Wireless Router0 (Piso 2 - WLAN1)
 
@@ -709,7 +725,7 @@ write memory
 | **Wireless Security** | Passphrase | `G1_PISO2` |
 | **Administration** | Router Password | `Grupo1_P2` |
 
-#### Wireless Router1 (Piso 2 - WLAN2)
+#### Wireless Router0(1) (Piso 2 - WLAN2)
 
 | Sección | Parámetro | Valor |
 |---------|-----------|-------|
@@ -766,26 +782,26 @@ write memory
 | **DHCP** | Start IP | `192.198.31.130` |
 | **DHCP** | Max Users | `80` |
 | **DHCP** | DNS Server | `192.198.100.2` |
-| **Wireless** | SSID | `PISO3_G1_R3` |
+| **Wireless** | SSID | `PISO3_G1_R2` |
 | **Wireless** | Broadcast | Enabled |
 | **Wireless Security** | Mode | WPA2 Personal |
 | **Wireless Security** | Passphrase | `G1_PISO3` |
 | **Administration** | Router Password | `Grupo1_P3` |
 
-### 8.3 Conexión Física MS0/MS3 → WRT300N — CORREGIDA v7
+### 8.3 Conexión Física Multilayer Switch0/Multilayer Switch3 → WRT300N
 
-> **CRÍTICO v7:** Los puertos de MS0/MS3 hacia los WRT300Ns son ahora **routed ports** (no switchport), cada uno en su propia subred /30. Conectar el cable desde el routed port del MS a Puerto **Internet** (WAN) del WRT300N. NO usar Access Port ni VLAN 11.
+> **CRÍTICO:** Los puertos de Multilayer Switch0/Multilayer Switch3 hacia los WRT300Ns son **routed ports** (no switchport), cada uno en su propia subred /30. Conectar el cable desde el routed port del switch al puerto **Internet** (WAN) del WRT300N. NO usar access port ni VLAN 11.
 
-**En MS0 (Piso 2):**
+**En Multilayer Switch0 (Piso 2):**
 ```bash
-# Puerto hacia WRT300N WLAN1 - ROUTED PORT
+! Puerto hacia WRT300N WLAN1 - ROUTED PORT
 interface GigabitEthernet0/1
 no switchport
 ip address 10.2.1.29 255.255.255.252
 no shutdown
 exit
 
-# Puerto hacia WRT300N WLAN2 - ROUTED PORT
+! Puerto hacia WRT300N WLAN2 - ROUTED PORT
 interface GigabitEthernet0/2
 no switchport
 ip address 10.2.1.33 255.255.255.252
@@ -793,16 +809,16 @@ no shutdown
 exit
 ```
 
-**En MS3 (Piso 3):**
+**En Multilayer Switch3 (Piso 3):**
 ```bash
-# Puerto hacia WRT300N WLAN1 - ROUTED PORT
+! Puerto hacia WRT300N WLAN1 - ROUTED PORT
 interface GigabitEthernet0/1
 no switchport
 ip address 10.2.1.37 255.255.255.252
 no shutdown
 exit
 
-# Puerto hacia WRT300N WLAN2 - ROUTED PORT
+! Puerto hacia WRT300N WLAN2 - ROUTED PORT
 interface GigabitEthernet0/2
 no switchport
 ip address 10.2.1.41 255.255.255.252
@@ -811,9 +827,9 @@ exit
 ```
 
 **En cada WRT300N:**
-- Conectar cable desde el puerto Gi del MS al puerto **Internet** del WRT300N.
+- Conectar cable desde el puerto Gi del Multilayer Switch al puerto **Internet** del WRT300N.
 - Configurar WAN como Static IP con los valores de la sección 8.2.
-- El gateway del WRT300N es directamente el IP del routed port del MS.
+- El gateway del WRT300N es directamente el IP del routed port del Multilayer Switch.
 
 ## 9. Configuración DNS y Servidor Web
 
@@ -929,20 +945,20 @@ exit
 
 > **Grupo 28 es par → OSPF** (la suma 2+8=10, 1+0=1; el número de grupo 28 es par).
 
-### 10.1 Tabla de Router IDs — ACTUALIZADA v7
+### 10.1 Tabla de Router IDs
 
 | Dispositivo | Router ID    | Redes OSPF anunciadas                                           |
 | ----------- | ------------ | --------------------------------------------------------------- |
 | Router2     | 2.2.2.2      | 10.2.1.0/30, 192.198.100.0/25, 192.198.100.128/25             |
 | Router3     | 3.3.3.3      | 10.2.1.4/30, 192.198.100.0/25, 192.198.100.128/25             |
-| MS2         | 22.22.22.22  | 10.2.1.0/30, 10.2.1.4/30, 10.2.1.24/30                        |
-| MS4         | 44.44.44.44  | 10.2.1.8/30, 10.2.1.12/30, 10.2.1.16/30, 10.2.1.20/30, 10.2.1.24/30 |
+| Multilayer Switch2  | 22.22.22.22  | 10.2.1.0/30, 10.2.1.4/30, 10.2.1.24/30                        |
+| Multilayer Switch4  | 44.44.44.44  | 10.2.1.8/30, 10.2.1.12/30, 10.2.1.16/30, 10.2.1.20/30, 10.2.1.24/30 |
 | Router1     | 1.1.1.1      | 10.2.1.8/30, 192.198.11.0/25, 192.198.11.128/27               |
 | Router0     | 5.5.5.5      | 10.2.1.12/30, 192.198.11.0/25, 192.198.11.128/27              |
-| MS0         | 33.33.33.33  | 10.2.1.16/30, **10.2.1.28/30, 10.2.1.32/30**                  |
-| MS3         | 34.34.34.34  | 10.2.1.20/30, **10.2.1.36/30, 10.2.1.40/30**                  |
+| Multilayer Switch0  | 33.33.33.33  | 10.2.1.16/30, **10.2.1.28/30, 10.2.1.32/30**                  |
+| Multilayer Switch3  | 34.34.34.34  | 10.2.1.20/30, **10.2.1.36/30, 10.2.1.40/30**                  |
 
-> **⚠️ Nota v7:** MS0 y MS3 ya **NO** anuncian 192.198.11.128/27. Ese prefijo únicamente es anunciado por R1 y R0, que son los únicos routers físicamente conectados al segmento L2 de Piso 1. Anunciar 192.198.11.128/27 desde MS0/MS3 (en segmentos L2 distintos) causaba routing ambiguo en MS4 y hacía que el gateway de los WRT300Ns fuera inalcanzable. Con la arquitectura v7, cada segmento /30 es único y no hay superposición.
+> **⚠️ Nota:** Multilayer Switch0 y Multilayer Switch3 **NO** anuncian 192.198.11.128/27. Ese prefijo únicamente es anunciado por R1 y R0, que son los únicos routers físicamente conectados al segmento L2 de Piso 1. Anunciar 192.198.11.128/27 desde Multilayer Switch0/Multilayer Switch3 (en segmentos L2 distintos) causa routing ambiguo en Multilayer Switch4 y hace que el gateway de los WRT300Ns sea inalcanzable. Cada segmento /30 es único y no hay superposición.
 
 ### 10.2 Router2
 
@@ -970,7 +986,7 @@ passive-interface GigabitEthernet0/1.41
 exit
 ```
 
-### 10.4 MS2
+### 10.4 Multilayer Switch2
 
 ```bash
 router ospf 1
@@ -981,7 +997,7 @@ network 10.2.1.24 0.0.0.3 area 0
 exit
 ```
 
-### 10.5 MS4
+### 10.5 Multilayer Switch4
 
 ```bash
 router ospf 1
@@ -1020,7 +1036,7 @@ passive-interface GigabitEthernet0/1.21
 exit
 ```
 
-### 10.8 MS0 — ACTUALIZADO v7
+### 10.8 Multilayer Switch0
 
 ```bash
 router ospf 1
@@ -1033,7 +1049,7 @@ passive-interface GigabitEthernet0/2
 exit
 ```
 
-### 10.9 MS3 — ACTUALIZADO v7
+### 10.9 Multilayer Switch3
 
 ```bash
 router ospf 1
@@ -1053,7 +1069,7 @@ show ip ospf neighbor
 show ip route ospf
 ```
 
-**Resultado esperado en MS4:**
+**Resultado esperado en Multilayer Switch4:**
 ```
 Neighbor ID     Pri   State           Dead Time   Address         Interface
 1.1.1.1          1   FULL/DR         00:00:38    10.2.1.10       Gi0/1
@@ -1063,33 +1079,33 @@ Neighbor ID     Pri   State           Dead Time   Address         Interface
 22.22.22.22      1   FULL/BDR        00:00:33    10.2.1.26       Po8
 ```
 
-> **Nota técnica (Packet Tracer):** En enlaces enrutados punto a punto (por ejemplo, los conectados hacia WRT300N), el estado del vecino puede mostrarse como `FULL/-` sin designación explícita DR/BDR. Este comportamiento es normal y no representa un error de configuración OSPF.
+> **Nota técnica (Packet Tracer):** En enlaces enrutados punto a punto entre equipos que sí ejecutan OSPF, el estado del vecino puede mostrarse como `FULL/-` sin designación explícita DR/BDR. Este comportamiento es normal y no representa un error de configuración. En esta topología, los enlaces hacia WRT300N están en `passive-interface`, por lo que no deben formar vecindad OSPF.
 
 ## 11. Configuración LACP
 
-> **⚠️ ORDEN DE IMPLEMENTACIÓN CRÍTICO (v8):** Los Port-channels deben existir y estar activos **antes** de aplicar los comandos OSPF. El orden correcto al configurar desde cero es:
+> **⚠️ ORDEN DE IMPLEMENTACIÓN CRÍTICO:** Los Port-channels deben existir y estar activos **antes** de aplicar los comandos OSPF. El orden correcto al configurar desde cero es:
 > ```
 > 1. VLANs e interfaces básicas
 > 2. LACP (crear EtherChannels y asignar IPs a Port-channels)
 > 3. OSPF (los network statements encontrarán las interfaces Po activas)
 > 4. HSRP
 > ```
-> Si se aplica OSPF antes que LACP, los `network` statements que referencian Po6, Po7, Po8 (MS4), Po2 (MS0), Po3 (MS3) y Po1 (MS2) no encontrarán interfaces activas.
+> Si se aplica OSPF antes que LACP, los `network` statements que referencian Po6, Po7, Po8 (Multilayer Switch4), Po2 (Multilayer Switch0), Po3 (Multilayer Switch3) y Po1 (Multilayer Switch2) no encontrarán interfaces activas.
 
 ### 11.1 Resumen EtherChannels
 
-| Port-Channel | Enlace      | MS4 Interfaces | Remoto | IP MS4     | IP Remoto  | Modo MS4 | Modo Remoto |
+| Port-Channel | Enlace      | Multilayer Switch4 Interfaces | Remoto | IP Multilayer Switch4 | IP Remoto  | Modo Switch4 | Modo Remoto |
 |--------------|-------------|----------------|--------|------------|------------|----------|-------------|
-| Po6          | P1 ↔ P2    | Fa0/17-20      | MS0 Po2 | 10.2.1.17 | 10.2.1.18 | active   | passive     |
-| Po7          | P1 ↔ P3    | Fa0/13-16      | MS3 Po3 | 10.2.1.21 | 10.2.1.22 | active   | passive     |
-| Po8          | P1 ↔ DC    | Fa0/21-24      | MS2 Po1 | 10.2.1.25 | 10.2.1.26 | active   | passive     |
+| Po6          | P1 ↔ P2    | Fa0/17-20      | Multilayer Switch0 Po2 | 10.2.1.17 | 10.2.1.18 | active   | passive     |
+| Po7          | P1 ↔ P3    | Fa0/13-16      | Multilayer Switch3 Po3 | 10.2.1.21 | 10.2.1.22 | active   | passive     |
+| Po8          | P1 ↔ DC    | Fa0/21-24      | Multilayer Switch2 Po1 | 10.2.1.25 | 10.2.1.26 | active   | passive     |
 
 > **Nota:** active + passive es la combinación correcta para LACP. Dos passive no forman canal.
 
-### 11.2 MS4
+### 11.2 Multilayer Switch4
 
 ```bash
-# Po6 - Hacia Piso 2
+! Po6 - Hacia Piso 2
 interface range FastEthernet0/17 - 20
 no switchport
 channel-group 6 mode active
@@ -1101,7 +1117,7 @@ ip address 10.2.1.17 255.255.255.252
 no shutdown
 exit
 
-# Po7 - Hacia Piso 3
+! Po7 - Hacia Piso 3
 interface range FastEthernet0/13 - 16
 no switchport
 channel-group 7 mode active
@@ -1113,7 +1129,7 @@ ip address 10.2.1.21 255.255.255.252
 no shutdown
 exit
 
-# Po8 - Hacia Data Center
+! Po8 - Hacia Data Center
 interface range FastEthernet0/21 - 24
 no switchport
 channel-group 8 mode active
@@ -1126,7 +1142,7 @@ no shutdown
 exit
 ```
 
-### 11.3 MS2
+### 11.3 Multilayer Switch2
 
 ```bash
 interface range FastEthernet0/21 - 24
@@ -1141,7 +1157,7 @@ no shutdown
 exit
 ```
 
-### 11.4 MS0
+### 11.4 Multilayer Switch0
 
 ```bash
 interface range FastEthernet0/21 - 24
@@ -1156,7 +1172,7 @@ no shutdown
 exit
 ```
 
-### 11.5 MS3
+### 11.5 Multilayer Switch3
 
 ```bash
 interface range FastEthernet0/21 - 24
@@ -1252,64 +1268,64 @@ Gi0/1.41    41   100   Standby  192.198.100.131 local           192.198.100.129
 ## 13. Comandos de Verificación
 
 ```bash
-# VLANs
+! VLANs
 show vlan brief
 show interfaces trunk
 
-# LACP
+! LACP
 show etherchannel summary
 show etherchannel 6 detail
 
-# OSPF
+! OSPF
 show ip ospf neighbor
 show ip route ospf
 
-# HSRP
+! HSRP
 show standby brief
 show standby
 
-# Routing general
+! Routing general
 show ip route
 ping 192.198.100.2
 
-# Verificar conectividad WiFi → Data Center
-# Desde un cliente WiFi del Piso 2 hacer ping a 192.198.100.2
+! Verificar conectividad WiFi → Data Center
+! Desde un cliente WiFi del Piso 2 hacer ping a 192.198.100.2
 ```
 
 ## 14. Pruebas de Conectividad
 
-- [ ] PC1 (VLAN 21) → Laptop1 (VLAN 11) ✅
-- [ ] PC1 → ServerWeb (192.198.100.2) ✅
-- [ ] Laptop1 → ServerDHCP (192.198.100.130) ✅
-- [ ] Dispositivo WiFi Piso 2 → ServerWeb ✅
-- [ ] Dispositivo WiFi Piso 3 → ServerWeb ✅
-- [ ] DNS resuelve www.practica2_Grupo1.com desde Piso 1 ✅
-- [ ] DNS resuelve www.practica2_Grupo1.com desde Piso 2 (WiFi) ✅
-- [ ] DNS resuelve www.practica2_Grupo1.com desde Piso 3 (WiFi) ✅
-- [ ] Página web se muestra en los 3 pisos ✅
-- [ ] HSRP failover (apagar Router1 → Router0 toma el control) ✅
-- [ ] HSRP failover Data Center (apagar Router2 → Router3 asume) ✅
-- [ ] LACP failover (desconectar un enlace del bundle → tráfico continúa) ✅
+- [x] PC1 (VLAN 21) → Laptop1 (VLAN 11)
+- [x] PC1 → ServerWeb (192.198.100.2)
+- [x] Laptop1 → ServerDHCP (192.198.100.130)
+- [x] Dispositivo WiFi Piso 2 → ServerWeb
+- [x] Dispositivo WiFi Piso 3 → ServerWeb
+- [x] DNS resuelve www.practica2_Grupo1.com desde Piso 1
+- [x] DNS resuelve www.practica2_Grupo1.com desde Piso 2 (WiFi)
+- [x] DNS resuelve www.practica2_Grupo1.com desde Piso 3 (WiFi)
+- [x] Página web se muestra en los 3 pisos
+- [x] HSRP failover (apagar Router1 → Router0 toma el control)
+- [x] HSRP failover Data Center (apagar Router2 → Router3 asume)
+- [x] LACP failover (desconectar un enlace del bundle → tráfico continúa)
 
 ## 15. Notas Importantes
 
 1. **WRT300N en Packet Tracer**: El puerto WAN/Internet NO soporta 802.1Q. Debe conectarse a un routed port o access port, nunca a un trunk.
 
-2. **Routed Ports MS0/MS3 → WRT300N (v7)**: MS0 y MS3 usan routed ports directos en subredes /30 (10.2.1.28/30, .32/30, .36/30, .40/30) para conectar los WRT300Ns. Esto elimina el conflicto de prefix OSPF y garantiza que el WRT300N pueda alcanzar su gateway. Ya NO se usan SVIs VLAN 11 en MS0/MS3.
+2. **Routed Ports Multilayer Switch0/Multilayer Switch3 → WRT300N**: Multilayer Switch0 y Multilayer Switch3 usan routed ports directos en subredes /30 (10.2.1.28/30, .32/30, .36/30, .40/30) para conectar los WRT300Ns. Esto elimina el conflicto de prefijo OSPF y garantiza que el WRT300N pueda alcanzar su gateway. Ya NO se usan SVIs VLAN 11 en Multilayer Switch0/Multilayer Switch3.
 
 3. **Subnetting**: VLAN 21 usa 192.198.11.0/25 (123 hosts DHCP). VLAN 11 usa 192.198.11.128/27 (27 hosts DHCP disponibles). Esta subred ADMIN solo existe en Piso 1 (Switch0 + R0 + R1). Los pisos 2 y 3 usan 10.2.1.x para tránsito.
 
-4. **LACP**: MS4 usa `active`, MS0/MS3/MS2 usan `passive`. Combinación correcta para LACP.
+4. **LACP**: Multilayer Switch4 usa `active`, Multilayer Switch0/Multilayer Switch3/Multilayer Switch2 usan `passive`. Combinación correcta para LACP.
 
-5. **OSPF**: MS0/MS3 únicamente anuncian sus enlaces /30 propios. La red 192.198.11.128/27 es exclusiva de R0 y R1 (únicos con interfaces físicas en ese segmento L2). Anunciar esa red desde MS0/MS3 causaba routing ambiguo y gateway inalcanzable en los WRT300Ns.
+5. **OSPF**: Multilayer Switch0/Multilayer Switch3 únicamente anuncian sus enlaces /30 propios. La red 192.198.11.128/27 es exclusiva de R0 y R1 (únicos con interfaces físicas en ese segmento L2). Anunciar esa red desde Multilayer Switch0/Multilayer Switch3 causaba routing ambiguo y gateway inalcanzable en los WRT300Ns.
 
 6. **DNS en WRT300N**: Todos los WRT300N tienen configurado DNS Server `192.198.100.2` para que los clientes WiFi puedan resolver www.practica2_Grupo1.com.
 
-7. **Flujo NAT WiFi**: Los clientes WiFi obtienen IPs en 192.198.21.x o 192.198.31.x. El WRT300N hace NAT hacia su WAN (10.2.1.x/30). MS0/MS3 enrutan hacia MS4, que enruta hacia el Data Center. El retorno funciona por OSPF.
+7. **Flujo NAT WiFi**: Los clientes WiFi obtienen IPs en 192.198.21.x o 192.198.31.x. El WRT300N hace NAT hacia su WAN (10.2.1.x/30). Multilayer Switch0/Multilayer Switch3 enrutan hacia Multilayer Switch4, que enruta hacia el Data Center. El retorno funciona por OSPF.
 
 ---
 
-**Manual Técnico - Práctica 2 — v8**
+**Manual Técnico - Práctica 2**
 **Grupo 28 - Redes de Computadoras 2**
 **Universidad San Carlos de Guatemala**
 **Facultad de Ingeniería**
