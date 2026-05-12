@@ -29,7 +29,8 @@
 
 | # | Descripción | Enlace |
 |---|-------------|--------|
-| 1 | Monte Alto y la Conectividad – Red LAN segmentada con VLANs, VTP, STP y enrutamiento dinámico | [Práctica 1](Practica1/Readme.md) |
+| 1 | Monte Alto y la Conectividad – Red LAN segmentada con VLANs, VTP, STP y enrutamiento dinámico | [Práctica 1](Practica1/README.md) |
+| 2 | La Facultad de Ingeniería y su Problema de Conectividad en la Biblioteca | [Práctica 2](Practica2/README.md) |
 
 ### Proyectos
 
