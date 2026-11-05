@@ -1,68 +1,50 @@
-<div align="center">
+# Prácticas de VLAN, switching y redundancia de red
 
-# ☁️ Cloud Network Infrastructure & Site-to-Site VPN Connectivity (Redes 2)
+Entregas del Grupo 28 de Redes de Computadoras 2, con segmentación VLAN/VTP, switching, redundancia HSRP y routing OSPF documentados por práctica.
 
-**Implementación de conectividad híbrida multinube, túneles Site-to-Site y firewalls perimetrales para redes avanzadas.**
+## Requisitos
 
-[![Language](https://img.shields.io/badge/Language-Networking,%20Cloud-blue?style=for-the-badge)](https://github.com/Ennero/REDES2_1S2026_G28)
-[![Course](https://img.shields.io/badge/Course-Redes%20de%20Computadoras%202-003366?style=for-the-badge)](https://ingenieria.usac.edu.gt/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+Cisco Packet Tracer compatible con los .pkt. Seguir las tablas y configuraciones del README de cada práctica.
 
-</div>
+## Ejecución
 
----
+Los comandos parten de la raíz del repositorio, salvo donde se indica otra terminal.
 
-
-## 📌 Descripción General
-
-Este repositorio contiene la implementación y entrega de **☁️ Cloud Network Infrastructure & Site-to-Site VPN Connectivity (Redes 2)**, desarrollado en el curso de **Redes de Computadoras 2** en la Universidad de San Carlos de Guatemala.
-
-- **Objetivo:** Implementación de conectividad híbrida multinube, túneles Site-to-Site y firewalls perimetrales para redes avanzadas.
-- **Stack Principal:** `Networking, Cloud`.
-- **Área:** Ciencias de la Computación, Algoritmos y Desarrollo de Software.
-
----
-
-## 🚀 Características y Componentes
-
-- Implementación modular y buenas prácticas de codificación.
-- Manejo estructurado de datos, control de flujo y validaciones.
-- Documentación y scripts de soporte para compilación o ejecución.
-
----
-
-## 📦 Estructura del Proyecto
-
-```
-REDES2_1S2026_G28/
-├── src/ o archivos de código fuente
-├── docs/ (si aplica)
-├── .gitignore
-├── LICENSE
-└── README.md
+```bash
+# Abrir en Packet Tracer:
+# Practica1/Topologia.pkt
+# Practica2/Practica2_28.pkt
 ```
 
----
+## Recorrido de demostración
 
-## ⚙️ Requisitos y Ejecución
+Verificar VLAN/trunks y conectividad de la primera práctica. En la segunda, comprobar OSPF y los roles HSRP; simular una caída de enlace en una copia de trabajo para observar la redundancia.
 
-1. Clonar el repositorio:
-   ```bash
-   git clone https://github.com/Ennero/REDES2_1S2026_G28.git
-   cd REDES2_1S2026_G28
-   ```
-2. Ejecutar según el entorno (`Networking, Cloud`):
-   - Consultar los scripts o archivos principales del proyecto para parámetros específicos.
+## Organización
 
----
+Carpetas de la entrega: [`Practica1/`](Practica1/), [`Practica2/`](Practica2/).
 
-## 📄 Licencia
+## Documentación
 
-Este proyecto está bajo la Licencia **MIT**. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+- [README](Practica1/README.md)
+- [README](Practica2/README.md)
 
----
+## Alcance y límites
 
-## 👨‍💻 Autor
+El alcance corresponde a las prácticas del repositorio; no se anuncia conectividad VPN site-to-site ni infraestructura cloud sin una entrega que la respalde.
 
-- **Enner Mendizabal** - [@Ennero](https://github.com/Ennero)  
-- *Facultad de Ingeniería, Universidad de San Carlos de Guatemala.*
+## Integrantes
+
+| Carné     |             Nombre              |
+| --------- | :-----------------------------: |
+| 202302220 | Enner Esaí Mendizabal Castro    |
+| 202202410 | Marcos Daniel Bonifasi de Leon  |
+| 202300670 | David Estuardo Barrios Ramírez  |
+
+La documentación anterior a la actualización se conserva en [README-anterior.md](README-anterior.md) como referencia histórica; para iniciar el proyecto, seguir esta guía.
+
+## Contexto y licencia
+
+Trabajo académico o de aprendizaje conservado en el portafolio de [Enner Mendizabal](https://github.com/Ennero). Los créditos de los trabajos en grupo se conservan en sus entregas y manuales.
+
+Consultar [LICENSE](LICENSE) para la licencia de la raíz. Las dependencias y los componentes con avisos o licencias propios conservan sus condiciones.
